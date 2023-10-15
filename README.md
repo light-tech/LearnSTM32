@@ -43,9 +43,11 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
     $$P \times R = \frac{36 \times 1000 \times 1000}{50} = 36 \times 1000 \times 20$$
     (Note here that I am using Timer 2 which is connected to ABP1 according to the datasheet so the max clockspeed is 36 MHz.)
 
-    We also want R to be as large as possible (limited to 16-bit though) so we have more precise control (i.e. higher resolution) over the duty cycle. We could choose P = 72 and R = 10000; or P = 720 and R = 1000. I am choosing the later and for some unknown reason, I need to double the values given in the articles (`50` for 0 degree, `250` for 180 degree).
+    We also want R to be as large as possible (limited to 16-bit though) so we have more precise control (i.e. higher resolution) over the duty cycle. We could choose P = 72 and R = 10000; or P = 720 and R = 1000. I am choosing the later. For reason yet to be determined (need oscilloscope), I need to double the values given in the articles (`50` for 0 degree, `250` for 180 degree). Maybe, the value for P should be chosen differently.
 
   * `F103C6T6_STEPPER_28BYJ`: Stepper Motor + ULN2003AN driver module
+
+    Once again, [ControllersTech]( https://controllerstech.com/interface-stepper-motor-with-stm32/) already provides a good starting point. I am simplifying some function to reduce the number of switch cases. Also note that the page (and the video) forgets to mention that we need to connect the GND of the power supply to the driver module and the GND of the Blue Pill.
 
 ## Black Pill
 
