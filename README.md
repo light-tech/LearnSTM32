@@ -49,6 +49,16 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     Once again, [ControllersTech]( https://controllerstech.com/interface-stepper-motor-with-stm32/) already provides a good starting point. I am simplifying some function to reduce the number of switch cases. Also note that the page (and the video) forgets to mention that we need to connect the GND of the power supply to the driver module and the GND of the Blue Pill.
 
+  * `F103C6T6_ST7789_LCD`: 240x240 LCD module with ST7789 controller
+
+    This module is a break out module for the actual LCD display. Unfortunately, the module does not break out the CS (Chip Select) pin so we cannot do proper SPI. Check out [this good video on SPI](https://www.youtube.com/watch?v=MCi7dCBhVpQ).
+
+    A library with a good instruction is [available](https://github.com/Floyd-Fish/ST7789-STM32). This is what I used. (The version included in the project has DMA disabled and I also remove image rendering in the test as the Blue Pill does not have sufficient memory for that.)
+
+    The connection is similar to [here](https://blog.embeddedexpert.io/?p=1215); but check out the actual pins in CubeIDE (for SCK and **MOSI**, note that the Blue Pill should act as the Master and the module is a Slave and we need to output signal from Blue Pill Master to Slave) and I should say Vcc on the module should be connected to 3.3V instead of 5V. In the project configuration, I am using PA1 for RES and PA2 for DC.
+
+    I had a lot of trouble getting the result. I found out in the end that the display will not render anything *if ST-LINK is connected* (as I usually run the code via Serial Wire Debug in the IDE). I look and watch many tutorials but nobody mentions this crucial fact. So, after uploading the code, unplug the ST-LINK and plug the Blue Pill in via the micro-USB cable.
+
 ## Black Pill
 
 I am using STM32F411CEU6 with 512KB of Flash.
