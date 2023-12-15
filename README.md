@@ -59,6 +59,21 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     I had a lot of trouble getting the result. I found out in the end that the display will not render anything *if ST-LINK is connected* (as I usually run the code via Serial Wire Debug in the IDE). I look and watch many tutorials but nobody mentions this crucial fact. So, after uploading the code, unplug the ST-LINK and plug the Blue Pill in via the micro-USB cable.
 
+  * `F103C6T6_MPU6050_I2C`: Using gyroscope + accelerometer module MPU6050 (see the same example `F411CEU6_MPU6050_I2C` below)
+
+  * `F103C6T6_RC_IO`: Timer's Input Capture
+
+    In the servo example, we _output_ a signal to control a module.
+    In this example, we are going to use Timer's Input Capture function to **measure the width of a pulse** in an incoming signal. This allows us to use a [radio control system](https://en.wikipedia.org/wiki/Radio_control) in our projects.
+
+    The theory behind is already given by [ControllersTech]( https://controllerstech.com/input-capture-in-stm32/). Basically, this function captures the time at which a pin transitions from the LOW state to the HIGH state (a _rising_ edge) or vice versa (a _falling_ edge).
+
+    For the Blue Pill, we need to make some adaptation and not just on choosing the right numbers as in the servo example. The problem is that the STM32F1 family does NOT support _"Both Edges"_ for _Polarity Selection_ as in the article. In other words, we only get notified a.k.a. _interrupted_ on either the rising edge or the falling one. To capture both edges of the pulse, we have to _reconfigure_ the timer after capturing the rising edge to capture the falling one in our ISR (Interrupt Service Routine) a.k.a. interrupt handler and once the falling edge is captured, we switch the polarity selection back to rising for the next pulse. This can be accomplished with the convenient macro `__HAL_TIM_SET_CAPTUREPOLARITY`.
+
+    The example is made to be more practical by generating 4 PWM signals simultaneously off timer 1 (can connect one of PA8, PA9, PA10, PA11 to PA0 to see the different duty cycles).
+
 ## Black Pill
 
 I am using STM32F411CEU6 with 512KB of Flash.
+
+  * `F411CEU6_MPU6050_I2C`: The idea behind is [here](https://controllerstech.com/how-to-interface-mpu6050-gy-521-with-stm32/). It is fairly straight forward.
