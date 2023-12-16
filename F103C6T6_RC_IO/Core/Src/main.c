@@ -68,54 +68,84 @@ static void MX_TIM2_Init(void);
 #define TIMCLOCK   36000000
 #define PRESCALAR  36
 
-uint32_t IC_Val1 = 0;
-uint32_t IC_Val2 = 0;
-uint32_t Difference = 0;
-int Is_First_Captured = 0;
+// Struct to store information about a pulse width measurement channel
+struct ChannelInfo {
+	uint32_t IC_Val1;
+	uint32_t IC_Val2;
+	uint32_t Difference;
+	int Is_First_Captured;
 
-/* Measure Frequency */
-float frequency = 0;
+	/* Measure Width */
+	uint32_t usWidth;
+};
 
-/* Measure Width */
-uint32_t usWidth = 0;
+// Measurement channels
+struct ChannelInfo channels[4];
 
+// Timer 2 ISR
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)  // if the interrupt source is channel1
+	int channelIndex = -1;
+	uint32_t channel = 0;
+
+	switch(htim->Channel) {
+	case HAL_TIM_ACTIVE_CHANNEL_1:
+		channelIndex = 0;
+		channel = TIM_CHANNEL_1;
+		break;
+
+	case HAL_TIM_ACTIVE_CHANNEL_2:
+		channelIndex = 1;
+		channel = TIM_CHANNEL_2;
+		break;
+
+	case HAL_TIM_ACTIVE_CHANNEL_3:
+		channelIndex = 2;
+		channel = TIM_CHANNEL_3;
+		break;
+
+	case HAL_TIM_ACTIVE_CHANNEL_4:
+		channelIndex = 3;
+		channel = TIM_CHANNEL_4;
+		break;
+
+	default:
+		return; // Exit for invalid channel
+	}
+
+	if (channels[channelIndex].Is_First_Captured == 0) // if the first value is not captured
 	{
-		if (Is_First_Captured==0) // if the first value is not captured
+		channels[channelIndex].IC_Val1 = HAL_TIM_ReadCapturedValue(htim, channel); // read the first value
+		channels[channelIndex].Is_First_Captured = 1;  // set the first captured as true
+
+		// SPECIAL CODE FOR STM32F1: Switch polarity to FALLING!
+		__HAL_TIM_SET_CAPTUREPOLARITY(htim, channel, TIM_INPUTCHANNELPOLARITY_FALLING);
+	}
+	else // if the first is already captured
+	{
+		channels[channelIndex].IC_Val2 = HAL_TIM_ReadCapturedValue(htim, channel);  // read second value
+
+		if (channels[channelIndex].IC_Val2 > channels[channelIndex].IC_Val1)
 		{
-			IC_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); // read the first value
-			Is_First_Captured = 1;  // set the first captured as true
-
-			// SPECIAL CODE FOR STM32F1: Switch polarity to FALLING!
-			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+			channels[channelIndex].Difference = channels[channelIndex].IC_Val2 - channels[channelIndex].IC_Val1;
 		}
-		else // if the first is already captured
+
+		else if (channels[channelIndex].IC_Val1 > channels[channelIndex].IC_Val2)
 		{
-			IC_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);  // read second value
-
-			if (IC_Val2 > IC_Val1)
-			{
-				Difference = IC_Val2-IC_Val1;
-			}
-
-			else if (IC_Val1 > IC_Val2)
-			{
-				Difference = (0xffff - IC_Val1) + IC_Val2; // It should be 0xffff here instead of 0xffffffff?
-			}
-
-			float refClock = TIMCLOCK/(PRESCALAR);
-			float mFactor = 1000000/refClock;
-
-			usWidth = Difference*mFactor;
-
-			__HAL_TIM_SET_COUNTER(htim, 0);  // reset the counter
-			Is_First_Captured = 0; // set it back to false
-
-			// SPECIAL CODE FOR STM32F1: Switch the polarity back to RISING edge, for the next pulse.
-			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+			channels[channelIndex].Difference = (0xffff - channels[channelIndex].IC_Val1) + channels[channelIndex].IC_Val2; // It should be 0xffff here instead of 0xffffffff?
 		}
+
+		float refClock = TIMCLOCK/(PRESCALAR);
+		float mFactor = 1000000/refClock;
+
+		channels[channelIndex].usWidth = channels[channelIndex].Difference * mFactor;
+
+		// Do NOT reset the timer counter here because it could be in used by the other channels!
+		/* __HAL_TIM_SET_COUNTER(htim, 0);  // reset the counter */
+		channels[channelIndex].Is_First_Captured = 0; // set it back to false
+
+		// SPECIAL CODE FOR STM32F1: Switch the polarity back to RISING edge, for the next pulse.
+		__HAL_TIM_SET_CAPTUREPOLARITY(htim, channel, TIM_INPUTCHANNELPOLARITY_RISING);
 	}
 }
 /* USER CODE END 0 */
@@ -153,6 +183,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Start generating a PWM signal on channel 1-4 of timer 1 (pin PA8, PA9, PA10, PA11)
+  // In our setup, the clock frequency of timer 1 is 72 MHz, the prescalar is 72 and ARR is 100
+  // so the signal is essentially 72,000,000 / (72 x 100) = 10 kHz. This gives the period of
+  // 100 us so the pulse width should be the same as the duty cycle.
   TIM1->CCR1 = 25; // 25% Duty Cycle for Channel 1
   TIM1->CCR2 = 50; // 50% Duty Cycle for Channel 2
   TIM1->CCR3 = 75; // 75% Duty Cycle for Channel 3
@@ -162,8 +195,11 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 
-  // Start measuring the pulse width using channel 1 of timer 2 (pin PA0)
+  // Start measuring the pulse width using channel 1-4 of timer 2 (pin PA0, PA1, PA2, PA3)
   HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);
+  HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_4);
 
   /* USER CODE END 2 */
 

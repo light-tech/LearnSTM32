@@ -70,7 +70,10 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     For the Blue Pill, we need to make some adaptation and not just on choosing the right numbers as in the servo example. The problem is that the STM32F1 family does NOT support _"Both Edges"_ for _Polarity Selection_ as in the article. In other words, we only get notified a.k.a. _interrupted_ on either the rising edge or the falling one. To capture both edges of the pulse, we have to _reconfigure_ the timer after capturing the rising edge to capture the falling one in our ISR (Interrupt Service Routine) a.k.a. interrupt handler and once the falling edge is captured, we switch the polarity selection back to rising for the next pulse. This can be accomplished with the convenient macro `__HAL_TIM_SET_CAPTUREPOLARITY`.
 
-    The example is made to be more practical by generating 4 PWM signals simultaneously off timer 1 (can connect one of PA8, PA9, PA10, PA11 to PA0 to see the different duty cycles).
+    The example is made to be more practical by
+	  (i)  generating 4 PWM signals simultaneously off timer 1; and
+	  (ii) measure 4 signals simultaneously off timer 2
+	so one can connect PA8, PA9, PA10, PA11 (or the PWM outputs of a radio control receiver) to PA0, PA1, PA2, PA3 to see the different pulse widths.
 
 ## Black Pill
 
