@@ -65,19 +65,24 @@ static void MX_TIM2_Init(void);
 // used in the article. So after capturing the RISING edge, we have to switch polarity to capture the
 // FALLING edge; and once it is done, we switch back to RISING.
 
-#define TIMCLOCK   36000000
-#define PRESCALAR  36
+// According to the datasheet, Timer 2 is connected to ABP1. Its clock speed can be checked in the
+// "Clock Configuration" tab.
+#define TIMCLOCK   72000000    // Frequency of Timer 2 (timer performing the measurement)
+#define PRESCALAR  36          // Prescalar of Timer 2
 
 // Struct to store information about a pulse width measurement channel
 struct ChannelInfo {
 	uint32_t IC_Val1;
-	uint32_t IC_Val2;
-	uint32_t Difference;
+	uint32_t IC_Val2;          // Note that IC_Val2 and Difference can be made into local variables in the ISR
+	uint32_t Difference;       // but they are kept here for the purpose of debugging in Live Expression.
 	int Is_First_Captured;
 
 	/* Measure Width */
 	uint32_t usWidth;
 };
+
+const float refClock = TIMCLOCK/(PRESCALAR);
+const float mFactor = 1000000/refClock;      // Factor to convert from timer count into microseconds
 
 // Measurement channels
 struct ChannelInfo channels[4];
@@ -129,18 +134,19 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 		{
 			channels[channelIndex].Difference = channels[channelIndex].IC_Val2 - channels[channelIndex].IC_Val1;
 		}
-
 		else if (channels[channelIndex].IC_Val1 > channels[channelIndex].IC_Val2)
 		{
-			channels[channelIndex].Difference = (0xffff - channels[channelIndex].IC_Val1) + channels[channelIndex].IC_Val2; // It should be 0xffff here instead of 0xffffffff?
+			// It should be 0xffff (our ARR value) here instead of 0xffffffff.
+			channels[channelIndex].Difference = (0xffff - channels[channelIndex].IC_Val1) + channels[channelIndex].IC_Val2;
 		}
-
-		float refClock = TIMCLOCK/(PRESCALAR);
-		float mFactor = 1000000/refClock;
 
 		channels[channelIndex].usWidth = channels[channelIndex].Difference * mFactor;
 
 		// Do NOT reset the timer counter here because it could be in used by the other channels!
+		// Think about situation where channel 1 gets HIGH, then channel 2 goes HIGH then LOW before channel 1 gets LOW.
+		// If we reset at the time channel 2 goes LOW then captured value when channel 1 goes LOW is incorrect.
+		// Just let the timer reset normally. Unfortunately, for long signals, we cannot make sure the measurement is
+		// correct.
 		/* __HAL_TIM_SET_COUNTER(htim, 0);  // reset the counter */
 		channels[channelIndex].Is_First_Captured = 0; // set it back to false
 
