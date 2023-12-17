@@ -99,13 +99,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  // For unknown reason, I find that I have to double the actual numbers
-	  // to get the desired result (0 degree to 180 degree).
-	  htim2.Instance->CCR1 = 50;  // 25 duty cycle is .5 ms
+	  htim2.Instance->CCR1 = 25;  // 25 duty cycle is .5 ms
 	  HAL_Delay(1000);
-	  htim2.Instance->CCR1 = 150;  // 75 duty cycle is 1.5 ms
+	  htim2.Instance->CCR1 = 75;  // 75 duty cycle is 1.5 ms
 	  HAL_Delay(1000);
-	  htim2.Instance->CCR1 = 250;  // 125 duty cycle is 2.5 ms
+	  htim2.Instance->CCR1 = 125;  // 125 duty cycle is 2.5 ms
 	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
@@ -170,7 +168,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 720-1;
+  htim2.Init.Prescaler = 1440-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

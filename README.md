@@ -10,6 +10,8 @@ To accomplish this, I take a series of steps to understand
   2. the common communication protocols in the embedded world such as I2C, SPI, CAN
   3. the internals such as timer, DMA, etc.
 
+Some projects have source files linked to the files installed with Cube IDE. You can fix them by searching for and replacing my _Firwmare installation repository_ location `C:\Users\Anonymous\STM32Cube\Repository\` (checked _Preferences > STM 32 Cube > Firmware Updater_) with yours in the `.mxproject` file. You may need to change the firmware version as well.
+
 ## Blue Pill
 
 Note that I am using the version with the lower spec [STM32F103C6T6](https://www.st.com/en/microcontrollers-microprocessors/stm32f103c6.html) chip instead of the commonly used one (original?) with STM32F103C8T6.
@@ -38,12 +40,16 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
     Servos are controlled with PWM (not the same PWM that is used to control a load such as brightness of LED or motor). They also need a power supply that could output a sufficiently high current.
 
     I am adapting again from [ControllersTech](https://controllerstech.com/servo-motor-with-stm32/). His configuration is for an STM32F446RE board which runs at a much higher clockspeed 180 MHz (compared to ours at 72 MHz). The key idea is to choose two 16-bit values for the Prescalar (P) and ARR (R) to bring the frequency down to 50Hz:
-    $$\frac{36 MHz}{P \times R} = 50 Hz$$
+    $$\frac{72 MHz}{P \times R} = 50 Hz$$
     or
-    $$P \times R = \frac{36 \times 1000 \times 1000}{50} = 36 \times 1000 \times 20$$
-    (Note here that I am using Timer 2 which is connected to ABP1 according to the datasheet so the max clockspeed is 36 MHz.)
+    $$P \times R = \frac{72 \times 1000 \times 1000}{50} = 72 \times 1000 \times 20$$
+    (Note here that it is 72 MHz and not 36 MHz or 18 MHz because I did not do the step
 
-    We also want R to be as large as possible (limited to 16-bit though) so we have more precise control (i.e. higher resolution) over the duty cycle. We could choose P = 72 and R = 10000; or P = 720 and R = 1000. I am choosing the later. For reason yet to be determined (need oscilloscope), I need to double the values given in the articles (`50` for 0 degree, `250` for 180 degree). Maybe, the value for P should be chosen differently.
+    > Keeping this in mind, I am going to set the clock such that my TIM2 gets only 45 MHz.
+
+    in the article. In any case, this number comes from the value marked _ABP2 timer clocks (MHz)_ in the _Clock configuration_ tab.)
+
+    We also want $R$ to be as large as possible (limited to 16-bit though) so we have more precise control (i.e. higher resolution) over the duty cycle. We could choose $P = 72$ and $R = 20000$; or $P = 1440$ and $R = 1000$. I am choosing the later to match the duty cycles of the article.
 
   * `F103C6T6_STEPPER_28BYJ`: Stepper Motor + ULN2003AN driver module
 
