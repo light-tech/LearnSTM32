@@ -81,6 +81,10 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 	  (ii) measure 4 signals simultaneously off timer 2
 	so one can connect PA8, PA9, PA10, PA11 (or the PWM outputs of a radio control receiver) to PA0, PA1, PA2, PA3 to see the different pulse widths.
 
+  * `F103C6T6_USB_CDC`: Using USB port to communicate with the computer
+
+    The example is in [this video](https://www.youtube.com/watch?v=92A98iEFmaA).
+
 ## Black Pill
 
 I am using STM32F411CEU6 with 512KB of Flash.
