@@ -85,6 +85,10 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     The example is in [this video](https://www.youtube.com/watch?v=92A98iEFmaA).
 
+  * `F103C6T6_USB_HID_Keyboard`: Turning the Blue Pill into a custom USB keyboard to enter passwords
+
+    Modified from [this video](https://www.youtube.com/watch?v=tj1_hsQ5PR0).
+
 ## Black Pill
 
 I am using STM32F411CEU6 with 512KB of Flash.
