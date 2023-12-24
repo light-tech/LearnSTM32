@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usbd_hid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,7 +55,21 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+extern USBD_HandleTypeDef hUsbDeviceFS;
 
+typedef struct
+{
+	uint8_t MODIFIER;
+	uint8_t RESERVED;
+	uint8_t KEYCODE1;
+	uint8_t KEYCODE2;
+	uint8_t KEYCODE3;
+	uint8_t KEYCODE4;
+	uint8_t KEYCODE5;
+	uint8_t KEYCODE6;
+} keyboardHID;
+
+keyboardHID keyboardhid = {0,0,0,0,0,0,0,0};
 /* USER CODE END 0 */
 
 /**
@@ -98,6 +112,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  keyboardhid.KEYCODE1 = 0x04;  // press 'a'
+	  USBD_HID_SendReport(&hUsbDeviceFS, &keyboardhid, sizeof (keyboardhid));
+	  HAL_Delay (50);
+
+	  keyboardhid.KEYCODE1 = 0x00;  // release key
+	  USBD_HID_SendReport(&hUsbDeviceFS, &keyboardhid, sizeof (keyboardhid));
+	  HAL_Delay (1000);
   }
   /* USER CODE END 3 */
 }

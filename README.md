@@ -89,6 +89,10 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     Modified from [this video](https://www.youtube.com/watch?v=tj1_hsQ5PR0).
 
+    Since I am using links for the firmware library files, I have to unlink the file `usbd_hid.c` (by changing the `.project` file) and copy the source directly to `Middlewares` folder in order to make modifications without affecting the original file installed with the IDE.
+
+    I am not going to modify `usbd_hid.h` (so there is no need to make a copy). Instead, I am `#undef` and re`#define HID_MOUSE_REPORT_DESC_SIZE` right in `usbd_hid.c`.
+
 ## Black Pill
 
 I am using STM32F411CEU6 with 512KB of Flash.
