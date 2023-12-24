@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_hid.h"
+#include "usb_hid_keys.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -70,6 +71,62 @@ typedef struct
 } keyboardHID;
 
 keyboardHID keyboardhid = {0,0,0,0,0,0,0,0};
+
+int buttonPressed = 0; // Temporary for debugging
+
+// Got from https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2
+const char ascii_to_hid_key_map[95][2] = {
+    {0, KEY_SPACE}, {KEY_MOD_LSHIFT, KEY_1}, {KEY_MOD_LSHIFT, KEY_APOSTROPHE},
+    {KEY_MOD_LSHIFT, KEY_3}, {KEY_MOD_LSHIFT, KEY_4}, {KEY_MOD_LSHIFT, KEY_5},
+    {KEY_MOD_LSHIFT, KEY_7}, {0, KEY_APOSTROPHE}, {KEY_MOD_LSHIFT, KEY_9},
+    {KEY_MOD_LSHIFT, KEY_0}, {KEY_MOD_LSHIFT, KEY_8}, {KEY_MOD_LSHIFT, KEY_EQUAL},
+    {0, KEY_COMMA}, {0, KEY_MINUS}, {0, KEY_DOT}, {0, KEY_SLASH}, {0, KEY_0},
+    {0, KEY_1}, {0, KEY_2}, {0, KEY_3}, {0, KEY_4}, {0, KEY_5}, {0, KEY_6},
+    {0, KEY_7}, {0, KEY_8}, {0, KEY_9}, {KEY_MOD_LSHIFT, KEY_SEMICOLON},
+    {0, KEY_SEMICOLON}, {KEY_MOD_LSHIFT, KEY_COMMA}, {0, KEY_EQUAL},
+    {KEY_MOD_LSHIFT, KEY_DOT}, {KEY_MOD_LSHIFT, KEY_SLASH}, {KEY_MOD_LSHIFT, KEY_2},
+    {KEY_MOD_LSHIFT, KEY_A}, {KEY_MOD_LSHIFT, KEY_B}, {KEY_MOD_LSHIFT, KEY_C},
+    {KEY_MOD_LSHIFT, KEY_D}, {KEY_MOD_LSHIFT, KEY_E}, {KEY_MOD_LSHIFT, KEY_F},
+    {KEY_MOD_LSHIFT, KEY_G}, {KEY_MOD_LSHIFT, KEY_H}, {KEY_MOD_LSHIFT, KEY_I},
+    {KEY_MOD_LSHIFT, KEY_J}, {KEY_MOD_LSHIFT, KEY_K}, {KEY_MOD_LSHIFT, KEY_L},
+    {KEY_MOD_LSHIFT, KEY_M}, {KEY_MOD_LSHIFT, KEY_N}, {KEY_MOD_LSHIFT, KEY_O},
+    {KEY_MOD_LSHIFT, KEY_P}, {KEY_MOD_LSHIFT, KEY_Q}, {KEY_MOD_LSHIFT, KEY_R},
+    {KEY_MOD_LSHIFT, KEY_S}, {KEY_MOD_LSHIFT, KEY_T}, {KEY_MOD_LSHIFT, KEY_U},
+    {KEY_MOD_LSHIFT, KEY_V}, {KEY_MOD_LSHIFT, KEY_W}, {KEY_MOD_LSHIFT, KEY_X},
+    {KEY_MOD_LSHIFT, KEY_Y}, {KEY_MOD_LSHIFT, KEY_Z}, {0, KEY_LEFTBRACE},
+    {0, KEY_BACKSLASH}, {0, KEY_RIGHTBRACE}, {KEY_MOD_LSHIFT, KEY_6},
+    {KEY_MOD_LSHIFT, KEY_MINUS}, {0, KEY_GRAVE}, {0, KEY_A}, {0, KEY_B},
+    {0, KEY_C}, {0, KEY_D}, {0, KEY_E}, {0, KEY_F}, {0, KEY_G}, {0, KEY_H},
+    {0, KEY_I}, {0, KEY_J}, {0, KEY_K}, {0, KEY_L}, {0, KEY_M}, {0, KEY_N},
+    {0, KEY_O}, {0, KEY_P}, {0, KEY_Q}, {0, KEY_R}, {0, KEY_S}, {0, KEY_T},
+    {0, KEY_U}, {0, KEY_V}, {0, KEY_W}, {0, KEY_X}, {0, KEY_Y}, {0, KEY_Z},
+    {KEY_MOD_LSHIFT, KEY_LEFTBRACE}, {KEY_MOD_LSHIFT, KEY_BACKSLASH},
+    {KEY_MOD_LSHIFT, KEY_RIGHTBRACE}, {KEY_MOD_LSHIFT, KEY_GRAVE},
+};
+
+typedef struct
+{
+	uint8_t MODIFIER;
+	uint8_t KEYCODE1;
+} charKeyboardHID;
+
+#define MAX_PASSWORD_LEN 64
+
+uint8_t passwordLen;
+charKeyboardHID passwordKeypress[MAX_PASSWORD_LEN];
+
+// Convert a character into a modifier and key
+charKeyboardHID encodeChar(char c) {
+	charKeyboardHID kp = { 0, 0 };
+
+	if (c < 32 || c > 127)
+		return kp; // Error
+
+	int ch = c - 32;
+	kp.MODIFIER = ascii_to_hid_key_map[ch][0];
+	kp.KEYCODE1 = ascii_to_hid_key_map[ch][1];
+	return kp;
+}
 /* USER CODE END 0 */
 
 /**
@@ -102,7 +159,13 @@ int main(void)
   MX_GPIO_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+  const char *password = "AbC123456!@#$%^,./;"; // Testing a variety of characters
 
+  passwordLen = strlen(password);
+
+  for(int i = 0; i < passwordLen; i++) {
+	  passwordKeypress[i] = encodeChar(password[i]);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -112,13 +175,31 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  keyboardhid.KEYCODE1 = 0x04;  // press 'a'
-	  USBD_HID_SendReport(&hUsbDeviceFS, &keyboardhid, sizeof (keyboardhid));
-	  HAL_Delay (50);
+	  buttonPressed = 0;
 
-	  keyboardhid.KEYCODE1 = 0x00;  // release key
-	  USBD_HID_SendReport(&hUsbDeviceFS, &keyboardhid, sizeof (keyboardhid));
-	  HAL_Delay (1000);
+	  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_SET) {
+		  buttonPressed = 1;
+
+		  for(int i = 0; i < passwordLen; i++) {
+			  // Send the i-th character
+
+			  keyboardhid.MODIFIER = passwordKeypress[i].MODIFIER;
+			  keyboardhid.KEYCODE1 = passwordKeypress[i].KEYCODE1;
+			  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof (keyboardhid));
+
+			  HAL_Delay (50);
+
+			  keyboardhid.MODIFIER = 0x00;
+			  keyboardhid.KEYCODE1 = 0x00;
+			  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof (keyboardhid));
+
+			  HAL_Delay (50);
+		  }
+	  }
+
+	  // This is bad approach: the button press is only detected twice in a second.
+	  // User has to hold and release it in time.
+	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -176,12 +257,20 @@ void SystemClock_Config(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin : PB12 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

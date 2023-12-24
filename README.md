@@ -83,11 +83,13 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
   * `F103C6T6_USB_CDC`: Using USB port to communicate with the computer
 
-    The example is in [this video](https://www.youtube.com/watch?v=92A98iEFmaA).
+    The example is in [this video](https://www.youtube.com/watch?v=92A98iEFmaA). But watch also [the official training video series](https://www.youtube.com/watch?v=rI3yBmnfAZU&list=PLnMKNibPkDnFFRBVD206EfnnHhQZI4Hxa) and [Ben Eater's explanation](https://www.youtube.com/watch?v=wdgULBpRoXk) to know what is going on behind.
 
-  * `F103C6T6_USB_HID_Keyboard`: Turning the Blue Pill into a custom USB keyboard to enter passwords
+  * `F103C6T6_USB_HID_Keyboard`: Turning the Blue Pill into a custom USB keyboard to enter strings (such as password) on a single button press
 
     Modified from [this video](https://www.youtube.com/watch?v=tj1_hsQ5PR0).
+
+    Follow [this](https://microcontrollerslab.com/push-button-stm32-blue-pill-stm32cube-ide-tutorial/) for the circuit diagram to connect a push button with a pull-up resistor. Unlike the article, I am using pin `B12` for the button input. When the button is pushed, the (hardcoded) password string is entered. (This solution is not very responsive. We could use an interrupt to make it better.)
 
     Since I am using links for the firmware library files, I have to unlink the file `usbd_hid.c` (by changing the `.project` file) and copy the source directly to `Middlewares` folder in order to make modifications without affecting the original file installed with the IDE.
 
