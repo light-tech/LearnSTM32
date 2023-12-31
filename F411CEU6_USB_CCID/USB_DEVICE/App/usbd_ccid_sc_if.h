@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    usbd_ccid_sc_if_template.h
+  * @file    usbd_ccid_sc_if.h
   * @author  MCD Application Team
-  * @brief   header file for the usbd_ccid_sc_if_template.c file.
+  * @brief   header file for the usbd_ccid_sc_if.c file.
   ******************************************************************************
   * @attention
   *
@@ -29,7 +29,7 @@ extern "C" {
 #include "usbd_ccid_cmd.h"
 
 #ifndef __USBD_CCID_SMARTCARD_H
-#include "usbd_ccid_smartcard_template.h"
+#include "usbd_ccid_smartcard.h"
 #endif /* __USBD_CCID_SMARTCARD_H */
 
 /* Exported constants --------------------------------------------------------*/

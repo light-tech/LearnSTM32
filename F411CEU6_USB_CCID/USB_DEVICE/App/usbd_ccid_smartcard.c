@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    usbd_ccid_smartcard_template.c
+  * @file    usbd_ccid_smartcard.c
   * @author  MCD Application Team
   * @brief   This file provides all the Smartcard firmware functions.
   ******************************************************************************
@@ -21,7 +21,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_ccid_smartcard_template.h"
+#include "usbd_ccid_smartcard.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

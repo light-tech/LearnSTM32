@@ -100,3 +100,7 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_MPU6050_I2C`: The idea behind is [here](https://controllerstech.com/how-to-interface-mpu6050-gy-521-with-stm32/). It is fairly straight forward.
+
+  * `F411CEU6_USB_CCID`: Making a security token (work in progress).
+
+    At the moment, Cube IDE does not support code generation for CCID class USB even though the middleware library has it. So I selected the "Custom Human Interface Device Class" and copy the template files in the firmware repository to the project. Various adjustments are necessary to get it compiled. (The worst thing is everytime we perform code regeneration, we have to undo some of its effects. Let's hope that support comes eventually. Another function is composite device i.e. multiple device classes.)

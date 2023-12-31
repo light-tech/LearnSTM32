@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    usbd_ccid_if_template.c
+  * @file    usbd_ccid_if.c
   * @author  MCD Application Team
   * @brief   This file provides all the functions for USB Interface for CCID
   ******************************************************************************
@@ -18,7 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ccid.h"
-#include "usbd_ccid_if_template.h"
+#include "usbd_ccid_if.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -102,9 +102,9 @@ uint8_t CCID_DeInit(USBD_HandleTypeDef  *pdev)
 static uint8_t CCID_ControlReq(uint8_t req, uint8_t *pbuf, uint16_t *length)
 {
 #ifdef USE_USBD_COMPOSITE
-  USBD_CCID_HandleTypeDef  *hccid = (USBD_CCID_HandleTypeDef *)USBD_Device.pClassDataCmsit[USBD_Device.classId];
+  USBD_CCID_HandleTypeDef  *hccid = (USBD_CCID_HandleTypeDef *)hUsbDeviceFS.pClassDataCmsit[USBD_Device.classId];
 #else
-  USBD_CCID_HandleTypeDef  *hccid = (USBD_CCID_HandleTypeDef *)USBD_Device.pClassData;
+  USBD_CCID_HandleTypeDef  *hccid = (USBD_CCID_HandleTypeDef *)hUsbDeviceFS.pClassData;
 #endif /* USE_USBD_COMPOSITE */
 
   UNUSED(length);
@@ -117,7 +117,7 @@ static uint8_t CCID_ControlReq(uint8_t req, uint8_t *pbuf, uint16_t *length)
       hccid->slot_nb = ((uint16_t) * pbuf & 0x0fU);
       hccid->seq_nb = (((uint16_t) * pbuf & 0xf0U) >> 8);
 
-      if (CCID_CmdAbort(&USBD_Device, (uint8_t)hccid->slot_nb, (uint8_t)hccid->seq_nb) != 0U)
+      if (CCID_CmdAbort(&hUsbDeviceFS, (uint8_t)hccid->slot_nb, (uint8_t)hccid->seq_nb) != 0U)
       {
         /* If error is returned by lower layer :
         Generally Slot# may not have matched */
