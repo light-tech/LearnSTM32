@@ -1,2 +1,6 @@
 .metadata/
 */Debug/*
+**/.settings/
+**/*.launch
+
+Temp/
