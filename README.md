@@ -95,6 +95,10 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     I am not going to modify `usbd_hid.h` (so there is no need to make a copy). Instead, I am `#undef` and re`#define HID_MOUSE_REPORT_DESC_SIZE` right in `usbd_hid.c`.
 
+  * `F103C6T6_nRF24L01`: Wireless communication via nRF24L01+ modules.
+
+    Similar to `F411CEU6_nRF24L01` below but configured as a receiver.
+
 ## Black Pill
 
 I am using STM32F411CEU6 with 512KB of Flash.
@@ -108,3 +112,7 @@ I am using STM32F411CEU6 with 512KB of Flash.
   * `F411CEU6_SSD1306_OLED_I2C`: Another display example using common 128x64 OLED screen
 
     We use [this library](https://github.com/4ilo/ssd1306-stm32HAL).
+
+  * `F411CEU6_nRF24L01`: Wireless communication via nRF24L01+ modules.
+
+    The transmitter to `F103C6T6_nRF24L01`.
