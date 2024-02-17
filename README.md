@@ -116,3 +116,7 @@ I am using STM32F411CEU6 with 512KB of Flash.
   * `F411CEU6_nRF24L01`: Wireless communication via nRF24L01+ modules.
 
     The transmitter to `F103C6T6_nRF24L01`.
+
+    We are using [this library](https://github.com/mokhwasomssi/stm32_hal_nrf24l01p). Note that despite the appearance made on this page, `SPI2_CSN` (just like `CE` and `IRQ`) is not a pin configured by CubeIDE but you can select any pin as `GPIO_Output` and name it like that. I don't know why the author did not name it simply `CSN` like the other two.
+
+    The author also configured the pin for the onboard LED but did nothing with it so I added blinking code when the interrupt is fired.
