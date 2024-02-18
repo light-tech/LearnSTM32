@@ -9,7 +9,7 @@
 
 #include "nrf24l01p.h"
 
-extern SPI_HandleTypeDef hspi2;
+extern SPI_HandleTypeDef hspi1;
 
 
 static void cs_high()

@@ -17,16 +17,16 @@
 
 
 /* User Configurations */
-#define NRF24L01P_SPI                     (&hspi2)
+#define NRF24L01P_SPI                     (&hspi1)
 
-#define NRF24L01P_SPI_CS_PIN_PORT         GPIOB 
-#define NRF24L01P_SPI_CS_PIN_NUMBER       GPIO_PIN_13
+#define NRF24L01P_SPI_CS_PIN_PORT         GPIOA
+#define NRF24L01P_SPI_CS_PIN_NUMBER       GPIO_PIN_4
 
-#define NRF24L01P_CE_PIN_PORT             GPIOB
-#define NRF24L01P_CE_PIN_NUMBER           GPIO_PIN_12
+#define NRF24L01P_CE_PIN_PORT             GPIOA
+#define NRF24L01P_CE_PIN_NUMBER           GPIO_PIN_3
 
-#define NRF24L01P_IRQ_PIN_PORT            GPIOA
-#define NRF24L01P_IRQ_PIN_NUMBER          GPIO_PIN_8
+#define NRF24L01P_IRQ_PIN_PORT            GPIOB
+#define NRF24L01P_IRQ_PIN_NUMBER          GPIO_PIN_0
 
 #define NRF24L01P_PAYLOAD_LENGTH          8     // 1 - 32bytes
 
