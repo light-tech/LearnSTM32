@@ -45,6 +45,20 @@ SPI_HandleTypeDef hspi2;
 /* USER CODE BEGIN PV */
 // data array to be sent
 uint8_t tx_data[NRF24L01P_PAYLOAD_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
+
+// data array to be read
+uint8_t rx_data[NRF24L01P_PAYLOAD_LENGTH] = { 0, };
+
+#define TX_IRQ_PIN_PORT            GPIOA
+#define TX_IRQ_PIN_NUMBER          GPIO_PIN_8
+#define RX_IRQ_PIN_PORT            GPIOB
+#define RX_IRQ_PIN_NUMBER          GPIO_PIN_5
+
+// NRF instance for transmitter
+nRF24L01P nrf_tx = { &hspi2, {GPIOB, GPIO_PIN_13}, {GPIOB, GPIO_PIN_12}, 8 };
+
+// NRF instance for receiver
+nRF24L01P nrf_rx = { &hspi2, {GPIOB, GPIO_PIN_4}, {GPIOB, GPIO_PIN_3}, 8 };
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,11 +75,13 @@ int j = 0;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER) {
-		nrf24l01p_tx_irq(); // clear interrupt flag
+	if(GPIO_Pin == TX_IRQ_PIN_NUMBER) {
+		nrf24l01p_tx_irq(&nrf_tx); // clear interrupt flag
 
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, j == 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
 		j = 1 - j;
+	} else 	if(GPIO_Pin == RX_IRQ_PIN_NUMBER) {
+		nrf24l01p_rx_receive(&nrf_rx, rx_data); // read data when data ready flag is set
 	}
 }
 /* USER CODE END 0 */
@@ -100,7 +116,9 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  nrf24l01p_tx_init(2500, _1Mbps);
+  nrf24l01p_tx_init(&nrf_tx, 2500, _1Mbps);
+  nrf24l01p_rx_init(&nrf_rx, 2500, _1Mbps);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,7 +133,7 @@ int main(void)
           tx_data[i]++;
 
       // transmit
-      nrf24l01p_tx_transmit(tx_data);
+      nrf24l01p_tx_transmit(&nrf_tx, tx_data);
       HAL_Delay(100);
   }
   /* USER CODE END 3 */
@@ -225,10 +243,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CE_GPIO_Port, CE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, TX_CE_Pin|RX_CE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI2_CSN_GPIO_Port, SPI2_CSN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, TX_CSN_Pin|RX_CSN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
@@ -237,18 +255,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : CE_Pin SPI2_CSN_Pin */
-  GPIO_InitStruct.Pin = CE_Pin|SPI2_CSN_Pin;
+  /*Configure GPIO pins : TX_CE_Pin TX_CSN_Pin RX_CE_Pin RX_CSN_Pin */
+  GPIO_InitStruct.Pin = TX_CE_Pin|TX_CSN_Pin|RX_CE_Pin|RX_CSN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : IRQ_Pin */
-  GPIO_InitStruct.Pin = IRQ_Pin;
+  /*Configure GPIO pin : TX_IRQ_Pin */
+  GPIO_InitStruct.Pin = TX_IRQ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(IRQ_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(TX_IRQ_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : RX_IRQ_Pin */
+  GPIO_InitStruct.Pin = RX_IRQ_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(RX_IRQ_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);

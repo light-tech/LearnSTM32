@@ -15,21 +15,18 @@
 #include "main.h"    // header from stm32cubemx code generate
 #include <stdbool.h>
 
+typedef struct {
+	GPIO_TypeDef* port;
+	uint16_t pin;
+} PinInfo;
 
-/* User Configurations */
-#define NRF24L01P_SPI                     (&hspi2)
-
-#define NRF24L01P_SPI_CS_PIN_PORT         GPIOB 
-#define NRF24L01P_SPI_CS_PIN_NUMBER       GPIO_PIN_13
-
-#define NRF24L01P_CE_PIN_PORT             GPIOB
-#define NRF24L01P_CE_PIN_NUMBER           GPIO_PIN_12
-
-#define NRF24L01P_IRQ_PIN_PORT            GPIOA
-#define NRF24L01P_IRQ_PIN_NUMBER          GPIO_PIN_8
-
-#define NRF24L01P_PAYLOAD_LENGTH          8     // 1 - 32bytes
-
+// Structure to config the module so that we can use multiple modules in the library functions
+typedef struct {
+	SPI_HandleTypeDef *hspi;
+	PinInfo csn;
+	PinInfo ce;
+	uint16_t payloadLength;
+} nRF24L01P;
 
 /* nRF24L01+ typedefs */
 typedef uint8_t count;
@@ -55,50 +52,50 @@ typedef enum
 
 
 /* Main Functions */
-void nrf24l01p_rx_init(channel MHz, air_data_rate bps);
-void nrf24l01p_tx_init(channel MHz, air_data_rate bps);
+void nrf24l01p_rx_init(nRF24L01P *nrf, channel MHz, air_data_rate bps);
+void nrf24l01p_tx_init(nRF24L01P *nrf, channel MHz, air_data_rate bps);
 
-void nrf24l01p_rx_receive(uint8_t* rx_payload);
-void nrf24l01p_tx_transmit(uint8_t* tx_payload);
+void nrf24l01p_rx_receive(nRF24L01P *nrf, uint8_t* rx_payload);
+void nrf24l01p_tx_transmit(nRF24L01P *nrf, uint8_t* tx_payload);
 
 // Check tx_ds or max_rt
-void nrf24l01p_tx_irq();  
+void nrf24l01p_tx_irq(nRF24L01P *nrf);
 
 
 /* Sub Functions */
-void nrf24l01p_reset();
+void nrf24l01p_reset(nRF24L01P *nrf);
 
-void nrf24l01p_prx_mode();
-void nrf24l01p_ptx_mode();
+void nrf24l01p_prx_mode(nRF24L01P *nrf);
+void nrf24l01p_ptx_mode(nRF24L01P *nrf);
 
-void nrf24l01p_power_up();
-void nrf24l01p_power_down();
+void nrf24l01p_power_up(nRF24L01P *nrf);
+void nrf24l01p_power_down(nRF24L01P *nrf);
 
-uint8_t nrf24l01p_get_status();
-uint8_t nrf24l01p_get_fifo_status();
+uint8_t nrf24l01p_get_status(nRF24L01P *nrf);
+uint8_t nrf24l01p_get_fifo_status(nRF24L01P *nrf);
 
 // Static payload lengths
-void nrf24l01p_rx_set_payload_widths(widths bytes);
+void nrf24l01p_rx_set_payload_widths(nRF24L01P *nrf, widths bytes);
 
-uint8_t nrf24l01p_read_rx_fifo(uint8_t* rx_payload);
-uint8_t nrf24l01p_write_tx_fifo(uint8_t* tx_payload);
+uint8_t nrf24l01p_read_rx_fifo(nRF24L01P *nrf, uint8_t* rx_payload);
+uint8_t nrf24l01p_write_tx_fifo(nRF24L01P *nrf, uint8_t* tx_payload);
 
-void nrf24l01p_flush_rx_fifo();
-void nrf24l01p_flush_tx_fifo();
+void nrf24l01p_flush_rx_fifo(nRF24L01P *nrf);
+void nrf24l01p_flush_tx_fifo(nRF24L01P *nrf);
 
 // Clear IRQ pin. Change LOW to HIGH
-void nrf24l01p_clear_rx_dr();
-void nrf24l01p_clear_tx_ds();
-void nrf24l01p_clear_max_rt();
+void nrf24l01p_clear_rx_dr(nRF24L01P *nrf);
+void nrf24l01p_clear_tx_ds(nRF24L01P *nrf);
+void nrf24l01p_clear_max_rt(nRF24L01P *nrf);
 
-void nrf24l01p_set_rf_channel(channel MHz);
-void nrf24l01p_set_rf_tx_output_power(output_power dBm);
-void nrf24l01p_set_rf_air_data_rate(air_data_rate bps);
+void nrf24l01p_set_rf_channel(nRF24L01P *nrf, channel MHz);
+void nrf24l01p_set_rf_tx_output_power(nRF24L01P *nrf, output_power dBm);
+void nrf24l01p_set_rf_air_data_rate(nRF24L01P *nrf, air_data_rate bps);
 
-void nrf24l01p_set_crc_length(length bytes);
-void nrf24l01p_set_address_widths(widths bytes);
-void nrf24l01p_auto_retransmit_count(count cnt);
-void nrf24l01p_auto_retransmit_delay(delay us);
+void nrf24l01p_set_crc_length(nRF24L01P *nrf, length bytes);
+void nrf24l01p_set_address_widths(nRF24L01P *nrf, widths bytes);
+void nrf24l01p_auto_retransmit_count(nRF24L01P *nrf, count cnt);
+void nrf24l01p_auto_retransmit_delay(nRF24L01P *nrf, delay us);
 
 
 /* nRF24L01+ Commands */

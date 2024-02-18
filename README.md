@@ -97,7 +97,7 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
   * `F103C6T6_nRF24L01`: Wireless communication via nRF24L01+ modules.
 
-    Similar to `F411CEU6_nRF24L01` below but configured as a receiver.
+    Similar to `F411CEU6_nRF24L01` below but configured as a receiver ONLY.
 
 ## Black Pill
 
@@ -120,3 +120,5 @@ I am using STM32F411CEU6 with 512KB of Flash.
     We are using [this library](https://github.com/mokhwasomssi/stm32_hal_nrf24l01p). Note that despite the appearance made on this page, `SPI2_CSN` (just like `CE` and `IRQ`) is not a pin configured by CubeIDE but you can select any pin as `GPIO_Output` and name it like that. I don't know why the author did not name it simply `CSN` like the other two.
 
     The author also configured the pin for the onboard LED but did nothing with it so I added blinking code when the interrupt is fired.
+
+    For illustration purpose, I also modified the original library (namely, changing all functions' signatures to include a pointer to `struct` containing the module configuration i.e. the SPI to use, CSN, CE pins, ...) so that one can plug in multiple nRF24L01+ modules to the same Black Pill. (In practice, we obviously never do that.) With this change, one can connect `CE`, `CSN`, `IRQ` of the transmitter module to pins `B12`, `B13`, `A8` and those of the receiver module to pins `B3`, `B4`, `B5` and watch the `tx_data` gets copied **over the air** to `rx_data` in *Live Expression*. (Check the pin labels in the project `ioc`.)
