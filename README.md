@@ -113,6 +113,10 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     We use [this library](https://github.com/4ilo/ssd1306-stm32HAL).
 
+  * `F411CEU6_RFID_RC522`: RFID readers.
+
+    _Not yet started._
+
   * `F411CEU6_nRF24L01`: Wireless communication via nRF24L01+ modules.
 
     The transmitter to `F103C6T6_nRF24L01`.
@@ -122,3 +126,31 @@ I am using STM32F411CEU6 with 512KB of Flash.
     The author also configured the pin for the onboard LED but did nothing with it so I added blinking code when the interrupt is fired.
 
     For illustration purpose, I also modified the original library (namely, changing all functions' signatures to include a pointer to `struct` containing the module configuration i.e. the SPI to use, CSN, CE pins, ...) so that one can plug in multiple nRF24L01+ modules to the same Black Pill. (In practice, we obviously never do that.) With this change, one can connect `CE`, `CSN`, `IRQ` of the transmitter module to pins `B12`, `B13`, `A8` and those of the receiver module to pins `B3`, `B4`, `B5` and watch the `tx_data` gets copied **over the air** to `rx_data` in *Live Expression*. (Check the pin labels in the project `ioc`.)
+
+  * `F411CEU6_ADC_JSTICK_POT`: Joystick and potentiometer using ADC.
+
+    _Not yet started._
+
+  * `F411CEU6_LED_SHIFTREG`: 7-Segment displays, 8x8 LED matrix and 8-bit Shift Registers.
+
+    _Not yet started._
+
+  * `F411CEU6_SDCARD_SPI`: SD Card.
+
+    _Not yet started._
+
+  * `F411CEU6_MPU9250_SPI`: 9-DOF IMU module MPU-9250 using SPI.
+
+    _Not yet started._
+
+  * `F411CEU6_HMC5883L_I2C`: Compass module HMC5883L using I2C.
+
+    _Not yet started._
+
+  * `F411CEU6_uBlox_Neo6M`: GPS module Neo-6M from uBlox.
+
+    [ControllersTech](https://controllerstech.com/gps-neo-6m-with-stm32/)
+
+    _Not yet started._
+
+  * `F411CEU6_BMP280_I2C`: Barometer module BMP280.
