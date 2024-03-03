@@ -36,6 +36,16 @@
 			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c</location>
 		</link>
 		<link>
+			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_adc.c</name>
+			<type>1</type>
+			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c</location>
+		</link>
+		<link>
+			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_adc_ex.c</name>
+			<type>1</type>
+			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c</location>
+		</link>
+		<link>
 			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_cortex.c</name>
 			<type>1</type>
 			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c</location>
@@ -94,6 +104,21 @@
 			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_rcc_ex.c</name>
 			<type>1</type>
 			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c</location>
+		</link>
+		<link>
+			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_tim.c</name>
+			<type>1</type>
+			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c</location>
+		</link>
+		<link>
+			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_tim_ex.c</name>
+			<type>1</type>
+			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c</location>
+		</link>
+		<link>
+			<name>Drivers/STM32F4xx_HAL_Driver/stm32f4xx_ll_adc.c</name>
+			<type>1</type>
+			<location>C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c</location>
 		</link>
 	</linkedResources>
 </projectDescription>

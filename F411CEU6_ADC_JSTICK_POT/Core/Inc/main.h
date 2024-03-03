@@ -57,6 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define POTENTIOMETER_Pin GPIO_PIN_7
+#define POTENTIOMETER_GPIO_Port GPIOA
+#define JOYSTICK_VRY_Pin GPIO_PIN_0
+#define JOYSTICK_VRY_GPIO_Port GPIOB
+#define JOYSTICK_VRX_Pin GPIO_PIN_1
+#define JOYSTICK_VRX_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

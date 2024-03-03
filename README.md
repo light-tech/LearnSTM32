@@ -129,7 +129,7 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_ADC_JSTICK_POT`: Joystick and potentiometer using ADC.
 
-    _Not yet started._
+    We follow [this tutorial](https://www.digikey.com/en/maker/projects/getting-started-with-stm32-working-with-adc-and-dma/f5009db3a3ed4370acaf545a3370c30c) for the code, omitting the UART part as we could simply observe the values in _Live Expression_. There are other guides such as [this](https://controllerstech.com/stm32-adc-multi-channel-without-dma/), [this](https://controllerstech.com/stm32-adc-multiple-channels/) and [this](https://deepbluembedded.com/stm32-adc-tutorial-complete-guide-with-examples).
 
   * `F411CEU6_LED_SHIFTREG`: 7-Segment displays, 8x8 LED matrix and 8-bit Shift Registers.
 
@@ -149,7 +149,7 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_uBlox_Neo6M`: GPS module Neo-6M from uBlox.
 
-    The main tutorial is from [ControllersTech](https://controllerstech.com/gps-neo-6m-with-stm32/). Before that, we need to [set up UART ring buffer](https://controllerstech.com/ring-buffer-using-head-and-tail-in-stm32/).
+    The main tutorial is from [ControllersTech](https://controllerstech.com/gps-neo-6m-with-stm32/). Before that, we need to [set up UART ring buffer](https://controllerstech.com/ring-buffer-using-head-and-tail-in-stm32/). Also, I commented out the LCD part.
 
     Unlike many articles claimed, the module only works properly when I connected VCC to 3.3V, not 5V.
 
