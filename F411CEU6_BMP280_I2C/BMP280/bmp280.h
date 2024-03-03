@@ -9,7 +9,7 @@
 #ifndef __BMP280_H__
 #define __BMP280_H__
 
-#include "stm32f0xx_hal.h"
+#include "main.h"
 #include <stdint.h>
 #include <stdbool.h>
 

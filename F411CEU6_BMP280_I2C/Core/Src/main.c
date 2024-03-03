@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "BMP280/BMP280.h"
+#include "BMP280.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,7 +43,8 @@
 I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN PV */
-
+BMP280_HandleTypedef bmp280;
+float pressure, temperature, humidity;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,7 +90,13 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  bmp280_init_default_params(&bmp280.params);
+  bmp280.addr = BMP280_I2C_ADDRESS_0;
+  bmp280.i2c = &hi2c1;
 
+  while (!bmp280_init(&bmp280, &bmp280.params)) {
+	HAL_Delay(2000);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -99,6 +106,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    while (!bmp280_read_float(&bmp280, &temperature, &pressure, &humidity)) {
+	  HAL_Delay(1000);
+	}
+	HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
