@@ -129,7 +129,9 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_ADC_JSTICK_POT`: Joystick and potentiometer using ADC.
 
-    We follow [this tutorial](https://www.digikey.com/en/maker/projects/getting-started-with-stm32-working-with-adc-and-dma/f5009db3a3ed4370acaf545a3370c30c) for the code, omitting the UART part as we could simply observe the values in _Live Expression_. There are other guides such as [this](https://controllerstech.com/stm32-adc-multi-channel-without-dma/), [this](https://controllerstech.com/stm32-adc-multiple-channels/) and [this](https://deepbluembedded.com/stm32-adc-tutorial-complete-guide-with-examples).
+    We follow [this](https://controllerstech.com/stm32-adc-multi-channel-without-dma/) to read multiple ADC channels without DMA. I am simplifying the code a bit by using a single function to select the channel.
+
+    There are other guides such as [this](https://controllerstech.com/stm32-adc-multiple-channels/), [this tutorial](https://www.digikey.com/en/maker/projects/getting-started-with-stm32-working-with-adc-and-dma/f5009db3a3ed4370acaf545a3370c30c) and [this article](https://deepbluembedded.com/stm32-adc-tutorial-complete-guide-with-examples) which goes into explaining the many ADC configuration options.
 
   * `F411CEU6_LED_SHIFTREG`: 7-Segment displays, 8x8 LED matrix and 8-bit Shift Registers.
 
