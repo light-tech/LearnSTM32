@@ -157,4 +157,10 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     The location and the time error are too large (time is off by 2 hours). The altitude also jumps a lot (25m to 4m above sea level despite staying fix).
 
-  * `F411CEU6_BMP280_I2C`: Barometer module BMP280.
+  * `F411CEU6_BMP280_I2C`: Pressure and Temperature sensor module BMP280.
+
+    Many cheap [BMP280](https://components101.com/sensors/gy-bmp280-module) [module](https://electrocredible.com/bmp280-pinout-specifications-applications/) are [falsely advertised](https://forum.arduino.cc/t/bme280-problem/451941) as the more advanced BME280 (Pressure, Humidity and Temperature). See [this](https://goughlui.com/2018/08/05/note-bosch-sensortec-bmp280-vs-bme280-sensor-confusion/) to know which chip you get.
+
+    We are using the driver by [ciastkolog](https://github.com/ciastkolog/BMP280_STM32).
+
+
