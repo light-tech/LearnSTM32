@@ -149,8 +149,6 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_uBlox_Neo6M`: GPS module Neo-6M from uBlox.
 
-    [ControllersTech](https://controllerstech.com/gps-neo-6m-with-stm32/)
-
-    _Not yet started._
+    The main tutorial is from [ControllersTech](https://controllerstech.com/gps-neo-6m-with-stm32/). Before that, we need to [set up UART ring buffer](https://controllerstech.com/ring-buffer-using-head-and-tail-in-stm32/).
 
   * `F411CEU6_BMP280_I2C`: Barometer module BMP280.
