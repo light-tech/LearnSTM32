@@ -147,7 +147,9 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_HMC5883L_I2C`: Compass module HMC5883L using I2C.
 
-    _Not yet started._
+    A [driver library](https://github.com/jrowberg/i2cdevlib/tree/master/STM32HAL/HMC5883L) by Jeff Rowberg is available. (There are two versions but we use the HAL one.)
+
+    Like BMP/E280, this module is [confusing](https://forum.arduino.cc/t/any-way-to-use-hmc5883l-library-with-qmc5883l/623793).
 
   * `F411CEU6_uBlox_Neo6M`: GPS module Neo-6M from uBlox.
 
