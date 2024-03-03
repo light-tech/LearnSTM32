@@ -151,4 +151,8 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     The main tutorial is from [ControllersTech](https://controllerstech.com/gps-neo-6m-with-stm32/). Before that, we need to [set up UART ring buffer](https://controllerstech.com/ring-buffer-using-head-and-tail-in-stm32/).
 
+    Unlike many articles claimed, the module only works properly when I connected VCC to 3.3V, not 5V.
+
+    The location and the time error are too large (time is off by 2 hours). The altitude also jumps a lot (25m to 4m above sea level despite staying fix).
+
   * `F411CEU6_BMP280_I2C`: Barometer module BMP280.

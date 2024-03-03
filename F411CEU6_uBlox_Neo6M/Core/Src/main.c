@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "uartRingBuffer.h"
+#include "NMEA.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +57,16 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+char GGA[100];
+char RMC[100];
 
+GPSSTRUCT gpsData;
+
+int flagGGA = 0, flagRMC = 0;
+char lcdBuffer [50];
+
+
+int VCCTimeout = 5000; // GGA or RMC will not be received if the VCC is not sufficient
 /* USER CODE END 0 */
 
 /**
@@ -90,6 +100,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   Ringbuf_init ();
+  HAL_Delay (500);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,7 +108,65 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  if (Wait_for("GGA") == 1)
+	  {
 
+		  VCCTimeout = 5000;  // Reset the VCC Timeout indicating the GGA is being received
+
+		  Copy_upto("*", GGA);
+		  if (decodeGGA(GGA, &gpsData.ggastruct) == 0) flagGGA = 2;  // 2 indicates the data is valid
+		  else flagGGA = 1;  // 1 indicates the data is invalid
+	  }
+
+	  if (Wait_for("RMC") == 1)
+	  {
+
+		  VCCTimeout = 5000;  // Reset the VCC Timeout indicating the RMC is being received
+
+		  Copy_upto("*", RMC);
+		  if (decodeRMC(RMC, &gpsData.rmcstruct) == 0) flagRMC = 2;  // 2 indicates the data is valid
+		  else flagRMC = 1;  // 1 indicates the data is invalid
+	  }
+
+	  /* if ((flagGGA == 2) | (flagRMC == 2))
+		  {
+			  lcd_put_cur(0, 0);
+			  sprintf (lcdBuffer, "%02d:%02d:%02d, %02d%02d%02d", gpsData.ggastruct.tim.hour, \
+					  gpsData.ggastruct.tim.min, gpsData.ggastruct.tim.sec, gpsData.rmcstruct.date.Day, \
+					  gpsData.rmcstruct.date.Mon, gpsData.rmcstruct.date.Yr);
+			  lcd_send_string(lcdBuffer);
+			  memset(lcdBuffer, '\0', 50);
+			  lcd_put_cur(1, 0);
+			  sprintf (lcdBuffer, "%.2f%c, %.2f%c  ", gpsData.ggastruct.lcation.latitude, gpsData.ggastruct.lcation.NS,\
+					  gpsData.ggastruct.lcation.longitude, gpsData.ggastruct.lcation.EW);
+			  lcd_send_string(lcdBuffer);
+		  }
+
+		  else if ((flagGGA == 1) | (flagRMC == 1))
+		  {
+			  // Instead of clearing the display, it's better if we print spaces.
+			  // This will avoid the "refreshing" part
+			  lcd_put_cur(0, 0);
+			  lcd_send_string("   NO FIX YET   ");
+			  lcd_put_cur(1, 0);
+			  lcd_send_string("   Please wait  ");
+		  }
+
+		  if (VCCTimeout <= 0)
+		  {
+			  VCCTimeout = 5000;  // Reset the timeout
+
+			  //reset flags
+			  flagGGA =flagRMC =0;
+
+			  // You are here means the VCC is less, or maybe there is some connection issue
+			  // Check the VCC, also you can try connecting to the external 5V
+
+			  lcd_put_cur(0, 0);
+			  lcd_send_string("    VCC Issue   ");
+			  lcd_put_cur(1, 0);
+			  lcd_send_string("Check Connection");
+		  } */
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
