@@ -50,11 +50,18 @@ static uint8_t mode;
  */
 void HMC5883L_initialize() {
     devAddr = HMC5883L_DEFAULT_ADDRESS;
+
+    // Scan for the right address
+    for(devAddr = 0; devAddr <= 0x7F; devAddr++) {
     // write CONFIG_A register
-    I2Cdev_writeByte(devAddr, HMC5883L_RA_CONFIG_A,
+    bool success = I2Cdev_writeByte(devAddr, HMC5883L_RA_CONFIG_A,
         (HMC5883L_AVERAGING_8 << (HMC5883L_CRA_AVERAGE_BIT - HMC5883L_CRA_AVERAGE_LENGTH + 1)) |
         (HMC5883L_RATE_15     << (HMC5883L_CRA_RATE_BIT - HMC5883L_CRA_RATE_LENGTH + 1)) |
         (HMC5883L_BIAS_NORMAL << (HMC5883L_CRA_BIAS_BIT - HMC5883L_CRA_BIAS_LENGTH + 1)));
+    if (success) {
+        break;
+    }
+    }
 
     // write CONFIG_B register
     HMC5883L_setGain(HMC5883L_GAIN_1090);

@@ -149,7 +149,7 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     A [driver library](https://github.com/jrowberg/i2cdevlib/tree/master/STM32HAL/HMC5883L) by Jeff Rowberg is available. (There are two versions but we use the HAL one.)
 
-    Like BMP/E280, this module is [confusing](https://forum.arduino.cc/t/any-way-to-use-hmc5883l-library-with-qmc5883l/623793).
+    Like BMP/E280, this module is [confusing](https://forum.arduino.cc/t/any-way-to-use-hmc5883l-library-with-qmc5883l/623793). After modifying the code to scan the I2C bus, I found out that the module I got is an QMC5883L. So we are switching to [this library](https://github.com/Farondis/QMC5883L-stm32-hal). (It is unlikely to find an HMC5883L in the future.)
 
   * `F411CEU6_uBlox_Neo6M`: GPS module Neo-6M from uBlox.
 

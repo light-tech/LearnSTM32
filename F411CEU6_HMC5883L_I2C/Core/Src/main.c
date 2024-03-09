@@ -91,14 +91,13 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   I2Cdev_init(&hi2c1);
+  HMC5883L_initialize();
 
   connected = false;
   do {
 	  connected = HMC5883L_testConnection();
 	  HAL_Delay(500);
   } while (!connected);
-
-  HMC5883L_initialize();
   /* USER CODE END 2 */
 
   /* Infinite loop */
