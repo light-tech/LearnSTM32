@@ -6,7 +6,7 @@
  */
 
 #include "MPU9250.h"
-#include "spi.h"
+
 
 
 const uint8_t READWRITE_CMD = 0x80;

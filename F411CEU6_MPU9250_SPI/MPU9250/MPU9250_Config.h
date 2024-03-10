@@ -12,4 +12,6 @@
 #define	MPU9250_CS_GPIO		GY_CS_GPIO_Port
 #define	MPU9250_CS_PIN		GY_CS_Pin
 
+extern SPI_HandleTypeDef MPU9250_SPI;
+
 #endif /* UTIL_MPU9250_CONFIG_H_ */

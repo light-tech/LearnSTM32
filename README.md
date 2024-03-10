@@ -151,6 +151,8 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     I am starting with [this minimal library](https://github.com/desertkun/MPU9250). I will add more functionality based on the datasheet and maybe [this code](https://os.mbed.com/users/kylongmu/code/MPU9250_SPI/file/084e8ba240c1/MPU9250.cpp/). It maybe a good time to learn to do [DMA](https://blog.embeddedexpert.io/?p=708).
 
+	Refer to [this page](https://protosupplies.com/product/mpu-9250-3-axis-accel-gryo-mag-sensor-module/) for the pinout.
+
   * `F411CEU6_HMC5883L_I2C`: Compass module HMC5883L using I2C.
 
     A [driver library](https://github.com/jrowberg/i2cdevlib/tree/master/STM32HAL/HMC5883L) by Jeff Rowberg is available. (There are two versions but we use the HAL one.)
