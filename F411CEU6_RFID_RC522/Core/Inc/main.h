@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define RC522_CS_Pin GPIO_PIN_0
+#define RC522_CS_GPIO_Port GPIOB
+#define RC522_RST_Pin GPIO_PIN_1
+#define RC522_RST_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

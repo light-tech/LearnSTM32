@@ -115,7 +115,9 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_RFID_RC522`: RFID readers.
 
-    _Not yet started._
+    A library to drive the module is available [here](https://github.com/Hamid-R-Tanhaei/RFID-MIFARE-RC522-ARM-STM32). Watch [this](https://www.youtube.com/watch?v=hd3ntPzL6Jg) for background information. 
+
+	I am following [this article](https://blog.embeddedexpert.io/?p=768) and [this for the pinout](https://lastminuteengineers.com/how-rfid-works-rc522-arduino-tutorial/).
 
   * `F411CEU6_nRF24L01`: Wireless communication via nRF24L01+ modules.
 
