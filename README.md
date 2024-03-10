@@ -147,7 +147,9 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_MPU9250_SPI`: 9-DOF IMU module MPU-9250 using SPI.
 
-    _Not yet started._
+    The module supports I2C like the MPU6050 but we want to use SPI for faster communication.
+
+    I am starting with [this minimal library](https://github.com/desertkun/MPU9250). I will add more functionality based on the datasheet and maybe [this code](https://os.mbed.com/users/kylongmu/code/MPU9250_SPI/file/084e8ba240c1/MPU9250.cpp/). It maybe a good time to learn to do [DMA](https://blog.embeddedexpert.io/?p=708).
 
   * `F411CEU6_HMC5883L_I2C`: Compass module HMC5883L using I2C.
 
