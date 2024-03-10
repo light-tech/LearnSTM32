@@ -1,6 +1,7 @@
 
 #include "QMC5883L.h"
 
+extern I2C_HandleTypeDef hi2c1;
 
 uint8_t QMC5883L_Read_Reg(uint8_t reg)
 {

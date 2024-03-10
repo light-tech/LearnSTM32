@@ -9,13 +9,10 @@ Created : 21.11.2018
 #define QMC5883L_H
 
 #include "main.h"
-#include "stm32f1xx_hal.h"
 #include "stdarg.h"
-#include "i2c.h"
-#include "gpio.h"
 #include "math.h"
 
-#define QMC5883L_ADDRESS  		0x1A
+#define QMC5883L_ADDRESS  		0x1A    // 0x0D << 1
 #define QMC5883L_I2C_PORT		&hi2c1
 
 #define QMC5883L_DATA_READ_X_LSB	0x00

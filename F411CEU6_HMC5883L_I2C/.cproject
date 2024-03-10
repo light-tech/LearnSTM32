@@ -48,8 +48,8 @@
 									<listOptionValue builtIn="false" value="C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
 									<listOptionValue builtIn="false" value="C:/Users/Anonymous/STM32Cube/Repository/STM32Cube_FW_F4_V1.27.1/Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../HMC5883L"/>
 									<listOptionValue builtIn="false" value="../I2Cdev"/>
+									<listOptionValue builtIn="false" value="../HMC5883L"/>
 									<listOptionValue builtIn="false" value="../QMC5883L"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.267909144" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
