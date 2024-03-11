@@ -26,9 +26,9 @@ void Write_MFRC522(u_char addr, u_char val) {
   // - bottom 8 bits are the data bits being sent for that address, we send
   //   them as is
 //  rx_bits = MSS_SPI_transfer_frame( &g_mss_spi1, (((addr << 1) & 0x7E) << 8) |  val );
-  //HAL_SPI_TransmitReceive(&hspi2, (((addr << 1) & 0x7E) << 8) |  val , rx_bits, 1, 500);
-  HAL_SPI_Transmit(&hspi2, &addr_bits, 1, 500);
-  HAL_SPI_Transmit(&hspi2, &val, 1, 500);
+  //HAL_SPI_TransmitReceive(&MFRC522_HSPI, (((addr << 1) & 0x7E) << 8) |  val , rx_bits, 1, 500);
+  HAL_SPI_Transmit(&MFRC522_HSPI, &addr_bits, 1, 500);
+  HAL_SPI_Transmit(&MFRC522_HSPI, &val, 1, 500);
   // clear the select line-- we are done here
 //  MSS_SPI_clear_slave_select( &g_mss_spi1, MSS_SPI_SLAVE_0 );
   HAL_GPIO_WritePin(RC522_CS_GPIO_Port, RC522_CS_Pin, GPIO_PIN_SET);
@@ -60,11 +60,11 @@ u_char Read_MFRC522(u_char addr) {
   //   1 bit, clear the LSb, and set the MSb to indicate a read
   // - bottom 8 bits are all 0s on a read per 8.1.2.1 Table 6
 //  rx_bits = MSS_SPI_transfer_frame( &g_mss_spi1, ((((addr << 1) & 0x7E) | 0x80) << 8) | 0x00 );
-  //HAL_SPI_TransmitReceive(&hspi2, ((((addr << 1) & 0x7E) | 0x80) << 8) | 0x00 , rx_bits, 1, 500);
-//HAL_SPI_Transmit(&hspi2, (unsigned char*) ((((addr<<1) & 0x7E) | 0x80)), 1, 500);
-HAL_SPI_Transmit(&hspi2, &addr_bits, 1, 500);
+  //HAL_SPI_TransmitReceive(&MFRC522_HSPI, ((((addr << 1) & 0x7E) | 0x80) << 8) | 0x00 , rx_bits, 1, 500);
+//HAL_SPI_Transmit(&MFRC522_HSPI, (unsigned char*) ((((addr<<1) & 0x7E) | 0x80)), 1, 500);
+HAL_SPI_Transmit(&MFRC522_HSPI, &addr_bits, 1, 500);
 
-  HAL_SPI_Receive(&hspi2, &rx_bits, 1, 500);
+  HAL_SPI_Receive(&MFRC522_HSPI, &rx_bits, 1, 500);
   // clear the select line-- we are done here
 //  MSS_SPI_clear_slave_select( &g_mss_spi1, MSS_SPI_SLAVE_0 );
 

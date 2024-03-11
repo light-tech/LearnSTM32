@@ -2,7 +2,13 @@
 #define MFRC522_H_
 
 #include "main.h"
-#include "stm32f1xx_hal.h"
+
+typedef unsigned char u_char;
+typedef unsigned int uint;
+
+#define MFRC522_HSPI hspi1
+
+extern SPI_HandleTypeDef MFRC522_HSPI;
 
 
 //Maximum length of the array

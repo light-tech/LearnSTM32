@@ -4,7 +4,7 @@
     extern "C" {
     #endif
 
-    #include "stm32f1xx_hal.h"
+    #include "main.h"
     /**
      * @brief Initializes DWT_Cycle_Count for DWT_Delay_us function
      * @return Error DWT counter
