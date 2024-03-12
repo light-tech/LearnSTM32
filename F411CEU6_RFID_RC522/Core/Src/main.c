@@ -44,7 +44,20 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
+u_char status, cardstr[MAX_LEN+1];
+u_char card_data[17];
+uint32_t delay_val = 1000; //ms
 
+// To keep track of the phases of processing that we pass through
+uint16_t result = 0;
+
+u_char UID[5];
+
+// a private key to scramble data writing/reading to/from RFID card:
+u_char Mx1[7][5]={{0x12,0x45,0xF2,0xA8},{0xB2,0x6C,0x39,0x83},{0x55,0xE5,0xDA,0x18},
+				{0x1F,0x09,0xCA,0x75},{0x99,0xA2,0x50,0xEC},{0x2C,0x88,0x7F,0x3D}};
+
+u_char SectorKey[7];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,7 +103,15 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  // From the datasheet: Bring RST pin HIGH (bring it LOW will power down the module) to reset the module
+  HAL_GPIO_WritePin(RC522_RST_GPIO_Port, RC522_RST_Pin, GPIO_PIN_SET);
+  HAL_Delay(100);
+
+  // Now we can initialize the module
   MFRC522_Init();
+
+  // Put a breakpoint here to see the (module?) version
+  status = Read_MFRC522(VersionReg);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,6 +121,40 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+#if 1 // During testing: stop for inspection once succeed
+	if (result > 0) {
+		HAL_Delay(1000);
+		continue;
+	}
+#endif
+
+	// status = 0;
+	// Find cards
+	status = MFRC522_Request(PICC_REQIDL, cardstr);
+	if(status == MI_OK) {
+		result++;
+
+		HAL_Delay(1);
+		status = MFRC522_Anticoll(cardstr);
+
+		if(status == MI_OK) {
+			result++;
+			memcpy(UID, cardstr, 5);
+
+			HAL_Delay(1);
+			status = MFRC522_SelectTag(cardstr);
+
+			if (status > 0) {
+				result++;
+				// TODO ProcessTag();
+			}
+		}
+
+		MFRC522_Halt();
+	} else {
+		// Waiting for card
+	}
+	HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
