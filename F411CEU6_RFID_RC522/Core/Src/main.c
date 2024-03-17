@@ -60,6 +60,10 @@ u_char UID[5];
 // Select Acknowledge https://www.nxp.com/docs/en/application-note/AN10833.pdf
 u_char SAK = 0;
 
+// To read the entire 1KB of the card for inspection
+u_char CardContent[64][17];
+u_char CardReadStatus;
+
 // a private key to scramble data writing/reading to/from RFID card:
 u_char Mx1[7][5]={{0x12,0x45,0xF2,0xA8},{0xB2,0x6C,0x39,0x83},{0x55,0xE5,0xDA,0x18},
 				{0x1F,0x09,0xCA,0x75},{0x99,0xA2,0x50,0xEC},{0x2C,0x88,0x7F,0x3D}};
@@ -190,6 +194,32 @@ void ProcessTag() {
 	DWT_Delay_ms(1);
 	MFRC522_StopCrypto1();
 #endif
+	// Prepare the sector key to authenticate before reading/writing the block.
+	// This key is stored as the last 6 bytes of the trailer blocks in the sector.
+	// So it does not have to be the same for all sector.
+	// In a real application, this key can be set once by the user via PIN/password
+	// and re-derived from the password/PIN when the card is accessed.
+	// The default key is set to 6's 0xFF.
+	// WARNING: Once the key is changed, make sure to keep it somewhere so that we can later
+	// read the sector!
+	for(int i = 0; i < 6; i++) {
+		SectorKey[i] = 0xFF;
+	}
+
+	// Read the whole 1KB from the card by going through each blocks, authenticate then read.
+	// Adapted from https://lastminuteengineers.com/how-rfid-works-rc522-arduino-tutorial/
+	for(u_char blockNum = 0; blockNum < 64; blockNum++) {
+		status = MFRC522_Auth(0x60, blockNum, SectorKey, UID);
+
+		if (status == MI_OK) {
+			result++;
+
+			HAL_Delay(1);
+			CardReadStatus = MFRC522_Read(blockNum, CardContent[blockNum]);
+		}
+
+		HAL_Delay(10);
+	}
 }
 /* USER CODE END 0 */
 
