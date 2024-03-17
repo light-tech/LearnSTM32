@@ -67,7 +67,7 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     I had a lot of trouble getting the result. I found out in the end that the display will not render anything *if ST-LINK is connected* (as I usually run the code via Serial Wire Debug in the IDE). I look and watch many tutorials but nobody mentions this crucial fact. So, after uploading the code, unplug the ST-LINK and plug the Blue Pill in via the micro-USB cable.
 
-    The reason might be that the power supply from the ST-Link is not sufficient to drive the power-hungry LCD.
+    The reason might be that the power supply from the ST-Link is not sufficient to drive the power-hungry LCD. Or maybe [this](https://github.com/Bodmer/TFT_eSPI/issues/1758).
 
   * `F103C6T6_MPU6050_I2C`: Using gyroscope + accelerometer module MPU6050 (see the same example `F411CEU6_MPU6050_I2C` below)
 
@@ -143,7 +143,11 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_LED_SHIFTREG`: 7-Segment displays, 8x8 LED matrix and 8-bit Shift Registers SN74HC595N.
 
-    We are using SPI.
+    We are [exploiting SPI](https://github.com/miekush/led-bar-graph) for this. See [here](https://elektronotes.wordpress.com/2015/02/13/daisy-chained-74hc595s-controlled-by-spi-on-stm32f4-part-1-working-principle/) for the idea of exploiting DMA as well.
+
+    Refer to [this](https://www.labs.cs.uregina.ca/207/Online/Lab8/) for the connection. Long story short, pin `OE` should connect to `GND` and pin `SRCLR` should connect to `VCC`. Connect SPI's `MOSI` to `SER` and its `SCK` to `SRCLK`. The final GPIO Output pin (mark `LATCH` in the project configuration) connect to `RCLK`. (Pin names are from this [datasheet](https://www.ti.com/lit/gpn/SN54HC595-SP).)
+
+    For the 8x8 LED matrix, can we daisy-chain two shift registers by connecting one's `QH'` pin to the `SER` of the next one.
 
   * `F411CEU6_SDCARD_SPI`: SD Card.
 
