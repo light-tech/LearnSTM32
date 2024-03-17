@@ -43,7 +43,9 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
+uint8_t state;
 
+HAL_StatusTypeDef status;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,6 +101,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	for(state = 0x00; state <= 0xff; state++) {
+	  // state = 0xff;
+	  status = HAL_SPI_Transmit(&hspi1, &state, 1, 10);
+
+	  HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_SET);
+
+	  HAL_Delay(100);
+	}
   }
   /* USER CODE END 3 */
 }
