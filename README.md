@@ -22,6 +22,8 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
 
     The library to control the module via I2C is taken from [ControllersTech](https://controllerstech.com/i2c-lcd-in-stm32/).
 
+    It was not mentioned explicitly but one must connect the VCC of the LCD to 5V which is its designated operating voltage. Otherwise, the text will be very faintly visible. So we need to unplug the debugger and connect the Blue Pill via USB or use an external power source.
+
   * `F103C6T6_RTC_DS1302`: Real-time clock module DS1302.
 
     __Connection__: DS1302's `VCC, GND, CLK, DATA, RST` pins should be connected to `5V, GND, B6, B7, B5` of the Blue Pill respectively.
@@ -64,6 +66,8 @@ Most project has Serial Wire Debug enabled in SYS and Ceramic/Crystal Resonator 
     The connection is similar to [here](https://blog.embeddedexpert.io/?p=1215); but check out the actual pins in CubeIDE (for SCK and **MOSI**, note that the Blue Pill should act as the Master and the module is a Slave and we need to output signal from Blue Pill Master to Slave) and I should say Vcc on the module should be connected to 3.3V instead of 5V. In the project configuration, I am using PA1 for RES and PA2 for DC.
 
     I had a lot of trouble getting the result. I found out in the end that the display will not render anything *if ST-LINK is connected* (as I usually run the code via Serial Wire Debug in the IDE). I look and watch many tutorials but nobody mentions this crucial fact. So, after uploading the code, unplug the ST-LINK and plug the Blue Pill in via the micro-USB cable.
+
+    The reason might be that the power supply from the ST-Link is not sufficient to drive the power-hungry LCD.
 
   * `F103C6T6_MPU6050_I2C`: Using gyroscope + accelerometer module MPU6050 (see the same example `F411CEU6_MPU6050_I2C` below)
 
@@ -119,6 +123,8 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     I am following [this article](https://blog.embeddedexpert.io/?p=768) and [this for the pinout](https://lastminuteengineers.com/how-rfid-works-rc522-arduino-tutorial/).
 
+    The datasheet for (the main IC of) the module is [here](https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf). To communicate with the RFID tags, we also need the datasheet for them and this module is frequently sold with several [Mifare One tags](https://www.nxp.com/docs/en/data-sheet/MF1S50YYX_V1.pdf). The library only support this card, I believe.
+
   * `F411CEU6_nRF24L01`: Wireless communication via nRF24L01+ modules.
 
     The transmitter to `F103C6T6_nRF24L01`.
@@ -135,9 +141,9 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     There are other guides such as [this](https://controllerstech.com/stm32-adc-multiple-channels/), [this tutorial](https://www.digikey.com/en/maker/projects/getting-started-with-stm32-working-with-adc-and-dma/f5009db3a3ed4370acaf545a3370c30c) and [this article](https://deepbluembedded.com/stm32-adc-tutorial-complete-guide-with-examples) which goes into explaining the many ADC configuration options.
 
-  * `F411CEU6_LED_SHIFTREG`: 7-Segment displays, 8x8 LED matrix and 8-bit Shift Registers.
+  * `F411CEU6_LED_SHIFTREG`: 7-Segment displays, 8x8 LED matrix and 8-bit Shift Registers SN74HC595N.
 
-    _Not yet started._
+    We are using SPI.
 
   * `F411CEU6_SDCARD_SPI`: SD Card.
 

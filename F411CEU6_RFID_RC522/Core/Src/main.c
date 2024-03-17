@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "delay.h"
 #include "MFRC522.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +52,13 @@ uint32_t delay_val = 1000; //ms
 // To keep track of the phases of processing that we pass through
 uint16_t result = 0;
 
+// The type of card inserted
+u_char TagType[2];
+
 u_char UID[5];
+
+// Select Acknowledge https://www.nxp.com/docs/en/application-note/AN10833.pdf
+u_char SAK = 0;
 
 // a private key to scramble data writing/reading to/from RFID card:
 u_char Mx1[7][5]={{0x12,0x45,0xF2,0xA8},{0xB2,0x6C,0x39,0x83},{0x55,0xE5,0xDA,0x18},
@@ -70,7 +77,120 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void ProcessTag() {
+#if 0
+	SectorKey[0] = ((Mx1[0][0]) ^ (UID[0])) + ((Mx1[0][1]) ^ (UID[1]))
+			+ ((Mx1[0][2]) ^ (UID[2])) + ((Mx1[0][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+	SectorKey[1] = ((Mx1[1][0]) ^ (UID[0])) + ((Mx1[1][1]) ^ (UID[1]))
+			+ ((Mx1[1][2]) ^ (UID[2])) + ((Mx1[1][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+	SectorKey[2] = ((Mx1[2][0]) ^ (UID[0])) + ((Mx1[2][1]) ^ (UID[1]))
+			+ ((Mx1[2][2]) ^ (UID[2])) + ((Mx1[2][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+	SectorKey[3] = ((Mx1[3][0]) ^ (UID[0])) + ((Mx1[3][1]) ^ (UID[1]))
+			+ ((Mx1[3][2]) ^ (UID[2])) + ((Mx1[3][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+	SectorKey[4] = ((Mx1[4][0]) ^ (UID[0])) + ((Mx1[4][1]) ^ (UID[1]))
+			+ ((Mx1[4][2]) ^ (UID[2])) + ((Mx1[4][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+	SectorKey[5] = ((Mx1[5][0]) ^ (UID[0])) + ((Mx1[5][1]) ^ (UID[1]))
+			+ ((Mx1[5][2]) ^ (UID[2])) + ((Mx1[5][3]) ^ (UID[3])); // 0x11; //KeyA[0]
 
+	DWT_Delay_ms(1);
+	status = MFRC522_Auth(0x60, 3, SectorKey, cardstr);
+
+	if (status == MI_OK) {
+		result++;
+
+		if (HAL_GPIO_ReadPin(Key2_GPIO_Port, Key2_Pin) == 0) {
+			// Clean-Up the Card:
+			card_data[0] = 0xFF;
+			card_data[1] = 0xFF;
+			card_data[2] = 0xFF;
+			card_data[3] = 0xFF;
+			card_data[4] = 0xFF;
+			card_data[5] = 0xFF;
+			card_data[6] = 0xFF; //Access_bits[6]
+			card_data[7] = 0x07; //Access_bits[7]
+			card_data[8] = 0x80; //Access_bits[8]
+			card_data[9] = 0x88; //user_byte[9]
+			card_data[10] = 0x88; //user_byte[10]
+			card_data[11] = 0x88; //user_byte[11]
+			card_data[12] = 0x88; //user_byte[12]
+			card_data[13] = 0x88; //user_byte[13]
+			card_data[14] = 0x88; //user_byte[14]
+			card_data[15] = 0x88; //user_byte[15]
+			DWT_Delay_ms(1);
+			status = MFRC522_Write(3, card_data);
+			if (status == MI_OK) {
+				result++;
+				delay_val = 2000;
+			}
+		}
+	} else {
+		for (int i = 0; i < 16; i++) {
+			cardstr[i] = 0;
+		}
+		status = 0;
+		// Find cards
+		DWT_Delay_ms(1);
+		status = MFRC522_Request(PICC_REQIDL, cardstr);
+		DWT_Delay_ms(1);
+		status = MFRC522_Anticoll(cardstr);
+		DWT_Delay_ms(1);
+		status = MFRC522_SelectTag(cardstr);
+		SectorKey[0] = 0xFF;
+		SectorKey[1] = 0xFF;
+		SectorKey[2] = 0xFF;
+		SectorKey[3] = 0xFF;
+		SectorKey[4] = 0xFF;
+		SectorKey[5] = 0xFF;
+		DWT_Delay_ms(1);
+		status = MFRC522_Auth(0x60, 3, SectorKey, cardstr);
+		if (status == MI_OK) {
+			if (HAL_GPIO_ReadPin(Key1_GPIO_Port, Key1_Pin) == 0) {
+				card_data[0] = ((Mx1[0][0]) ^ (UID[0]))
+						+ ((Mx1[0][1]) ^ (UID[1])) + ((Mx1[0][2]) ^ (UID[2]))
+						+ ((Mx1[0][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+				card_data[1] = ((Mx1[1][0]) ^ (UID[0]))
+						+ ((Mx1[1][1]) ^ (UID[1])) + ((Mx1[1][2]) ^ (UID[2]))
+						+ ((Mx1[1][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+				card_data[2] = ((Mx1[2][0]) ^ (UID[0]))
+						+ ((Mx1[2][1]) ^ (UID[1])) + ((Mx1[2][2]) ^ (UID[2]))
+						+ ((Mx1[2][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+				card_data[3] = ((Mx1[3][0]) ^ (UID[0]))
+						+ ((Mx1[3][1]) ^ (UID[1])) + ((Mx1[3][2]) ^ (UID[2]))
+						+ ((Mx1[3][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+				card_data[4] = ((Mx1[4][0]) ^ (UID[0]))
+						+ ((Mx1[4][1]) ^ (UID[1])) + ((Mx1[4][2]) ^ (UID[2]))
+						+ ((Mx1[4][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+				card_data[5] = ((Mx1[5][0]) ^ (UID[0]))
+						+ ((Mx1[5][1]) ^ (UID[1])) + ((Mx1[5][2]) ^ (UID[2]))
+						+ ((Mx1[5][3]) ^ (UID[3])); // 0x11; //KeyA[0]
+				card_data[6] = 0xFF; //Access_bits[6]
+				card_data[7] = 0x07; //Access_bits[7]
+				card_data[8] = 0x80; //Access_bits[8]
+				card_data[9] = 0x88; //user_byte[9]
+				card_data[10] = 0x88; //user_byte[10]
+				card_data[11] = 0x88; //user_byte[11]
+				card_data[12] = 0x88; //user_byte[12]
+				card_data[13] = 0x88; //user_byte[13]
+				card_data[14] = 0x88; //user_byte[14]
+				card_data[15] = 0x88; //user_byte[15]
+				DWT_Delay_ms(1);
+				status = MFRC522_Write(3, card_data);
+				if (status == MI_OK) {
+					result++;
+					sprintf(str3, "Card Set!");
+					delay_val = 2000;
+				}
+			} else {
+				sprintf(str4, "New Card!");
+			}
+		} else if (status != MI_OK) {
+			sprintf(str3, "Auth. Error");
+		}
+	}
+	DWT_Delay_ms(1);
+	MFRC522_StopCrypto1();
+#endif
+}
 /* USER CODE END 0 */
 
 /**
@@ -130,7 +250,7 @@ int main(void)
 
 	// status = 0;
 	// Find cards
-	status = MFRC522_Request(PICC_REQIDL, cardstr);
+	status = MFRC522_Request(PICC_REQIDL, TagType);
 	if(status == MI_OK) {
 		result++;
 
@@ -142,11 +262,11 @@ int main(void)
 			memcpy(UID, cardstr, 5);
 
 			HAL_Delay(1);
-			status = MFRC522_SelectTag(cardstr);
+			SAK = MFRC522_SelectTag(cardstr);
 
-			if (status > 0) {
+			if (SAK > 0) {
 				result++;
-				// TODO ProcessTag();
+				ProcessTag();
 			}
 		}
 

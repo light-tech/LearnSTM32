@@ -6,7 +6,7 @@
 #include "MFRC522.h"
 //------------------------------------------------------
 /*
- * Function Nameï¼šWrite_MFRC5200
+ * Function Name: Write_MFRC5200
  * Function Description: To a certain MFRC522 register to write a byte of data
  * Input Parametersï¼šaddr - register address; val - the value to be written
  * Return value: None
@@ -104,7 +104,7 @@ void ClearBitMask(u_char reg, u_char mask)
 
 //-----------------------------------------------
 /*
- * Function Nameï¼šAntennaOn
+ * Function Name: AntennaOn
  * Description: Open antennas, each time you start or shut down the natural barrier between the transmitter should be at least 1ms interval
  * Input: None
  * Return value: None
@@ -128,7 +128,7 @@ void AntennaOff(void)
 
 
 /*
- * Function Name: ResetMFRC522
+ * Function Name: MFRC522_Reset
  * Description: Reset RC522
  * Input: None
  * Return value: None
@@ -139,7 +139,7 @@ void MFRC522_Reset(void)
 }
 //--------------------------------------------------
 /*
- * Function Nameï¼šInitMFRC522
+ * Function Name: MFRC522_Init
  * Description: Initialize RC522
  * Input: None
  * Return value: None
@@ -166,7 +166,7 @@ void MFRC522_Init(void)
 }
 //------------------------------------------------------------------
 /*
- * Function Nameï¼šMFRC522_Request
+ * Function Name: MFRC522_Request
  * Description: Find cards, read the card type number
  * Input parameters: reqMode - find cards way
  *   TagType - Return Card Type
@@ -505,7 +505,7 @@ u_char MFRC522_Auth(u_char authMode, u_char BlockAddr, u_char *Sectorkey, u_char
 //----------------------------------
 /*
  * Function Name: MFRC522_SelectTag
- * Description: election card, read the card memory capacity
+ * Description: Selection card, read the card memory capacity
  * Input parameters: serNum - Incoming card serial number
  * Return value: the successful return of card capacity
  */
