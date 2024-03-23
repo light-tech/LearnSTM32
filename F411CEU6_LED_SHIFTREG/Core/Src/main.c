@@ -44,7 +44,7 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 uint8_t state;
-
+uint16_t state2;
 HAL_StatusTypeDef status;
 /* USER CODE END PV */
 
@@ -114,6 +114,90 @@ void TestAllByteShift() {
 	}
 }
 
+
+// Shift out 2 bytes to the cascaded shift registers (one daisy chained to the another)
+// state = [H1 G F E ... A1 | H2 G F E ... A2]
+// where Ai, Bi, ..., Hi are the output of the i-th register. The 1st register is the one
+// whose data pin 14 (SER) is connected to the MCU's MOSI. The second one received its data
+// via the first's pin 9 (QH').
+void ShiftOut2(uint16_t state) {
+	status = HAL_SPI_Transmit(&hspi1, (uint8_t*)(&state), 2, 10);
+
+	HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_SET);
+}
+
+// Various functions to test daisy chained shift registers with a 4-digit 7-segment display and LED matrix
+// Connection assumption:
+//   * For 4-digit 7-segment dipslay:
+//         1st shift register connects to digit LEDs (A, B, ..., DP)
+//         2nd shift register A, B, C, D is connected to digit selection pin (pin 6, 8, 9, 12)
+//   * For LED matrix:
+//         1st shift register to the row pins
+//         2nd shift register to the column pins
+
+
+// Display the digit d at the digitNum (0..3 instead of 1..4)
+void DisplayDigit(uint8_t d, uint8_t digitNum) {
+	// We need to turn ONLY the bit for the digit off to ground it.
+	// The remaining bits are kept high so that the LEDs are not on for them.
+	uint8_t mask = 1 << digitNum;
+	mask = ~mask;
+
+	state2 = digits[d];
+	state2 = (state2 << 8) | mask;
+	ShiftOut2(state2);
+}
+
+// Render all digit slot one by one
+// For example, 0 is displayed in the first digit slot, then second, then third, then forth.
+// Then 1 is displayed in the first, ... etc.
+void TestAllDigits() {
+	for(uint8_t d = 0; d < 10; d++) {
+		for(uint8_t n = 0; n < 4; n++) {
+			DisplayDigit(d, n);
+			HAL_Delay(1000);
+		}
+	}
+}
+
+// Quickly display 4-digit for "persistence of vision" (switching 1ms between digits)
+// Note: d[s] is the most significant digit, d[3] is the least significant one
+void Display4DigitNum(uint8_t d[4], uint8_t s) {
+	for(uint8_t i = s; i < 4; i++) {
+		DisplayDigit(d[i], i);
+		HAL_Delay(1);
+	}
+}
+
+void TestCounting() {
+	uint8_t d[4];
+	for(int value = 0; value <= 9999; value++) {
+		int x = value;
+		// Note that the ordering of digits on the 7-segment display is in reverse order
+		// with the 1st being the most significant digit and the 4-th the least one.
+		d[3] = x % 10; // unit digit
+		x = x / 10;
+		d[2] = x % 10; // ten digit
+		x = x / 10;
+		d[1] = x % 10;
+		d[0] = x / 10;
+
+		// Find the start digit (the actual most significant digit)
+		uint8_t s = 0;
+		for(s = 0; s < 3; s++) {
+			if (d[s] != 0)
+				break;
+		}
+
+		// Loop 200 times to keep the digit on display for ~200ms
+		for(int c = 0; c < 200; c++) {
+			Display4DigitNum(d, s);
+		}
+
+		// HAL_Delay(50);
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -156,9 +240,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	TestDigits();
-	TestAllByteShift();
+	// TestDigits();
+	// TestAllByteShift();
 
+	// TestAllDigits();
+	TestCounting();
   }
   /* USER CODE END 3 */
 }
