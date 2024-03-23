@@ -214,12 +214,45 @@ void DisplaySinglePixel(uint8_t row, uint8_t col) {
 	ShiftOut2(state2);
 }
 
+// Light up all pixels of the LED matrix one by one
 void TestPixels() {
 	for(uint8_t row = 0; row < 8; row++) {
 		for(uint8_t col = 0; col < 8; col++) {
 			DisplaySinglePixel(row, col);
 			HAL_Delay(200);
 		}
+	}
+}
+
+// Render a bitmap where bitmap[i] is the i-th row (assumed already inverted for now)
+// Once again we exploit persistence of vision: we render row-by-row with 1ms delay between rows
+void RenderBitmap(uint8_t bitmap[8]) {
+	for(uint8_t row = 0; row < 8; row++) {
+		uint8_t mask = ~bitmap[row]; // Output LOW to the selected columns on the given row
+
+		state2 = 1 << row;
+		state2 = (state2 << 8) | mask;
+
+		ShiftOut2(state2);
+
+		HAL_Delay(1);
+	}
+}
+
+uint8_t infiniteBitmap[8] = {
+	0b00000000,
+	0b00000000,
+	0b01100110,
+	0b10011001,
+	0b10011001,
+	0b01100110,
+	0b00000000,
+	0b00000000
+};
+
+void TestBitmap() {
+	for(int i = 0; i < 100; i++) {
+		RenderBitmap(infiniteBitmap);
 	}
 }
 /* USER CODE END 0 */
@@ -271,6 +304,7 @@ int main(void)
 	// TestCounting();
 
 	TestPixels();
+	TestBitmap();
   }
   /* USER CODE END 3 */
 }
