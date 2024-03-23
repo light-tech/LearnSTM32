@@ -198,6 +198,30 @@ void TestCounting() {
 		// HAL_Delay(50);
 	}
 }
+
+// Turn a single pixel on the 8x8 LED matrix
+// Row and Column are indexed from 0 to 7 corresponding to 1..8 as in the datasheet of the unit
+void DisplaySinglePixel(uint8_t row, uint8_t col) {
+	// To turn the row-i column-j pixels on, we need to input HIGH (VCC) to the pin Ri and LOW (GND) to Cj.
+	// This way, electricity will flow through the LED at (i, j).
+
+	uint8_t mask = 1 << col;
+	mask = ~mask;
+
+	state2 = 1 << row;
+	state2 = (state2 << 8) | mask;
+
+	ShiftOut2(state2);
+}
+
+void TestPixels() {
+	for(uint8_t row = 0; row < 8; row++) {
+		for(uint8_t col = 0; col < 8; col++) {
+			DisplaySinglePixel(row, col);
+			HAL_Delay(200);
+		}
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -244,7 +268,9 @@ int main(void)
 	// TestAllByteShift();
 
 	// TestAllDigits();
-	TestCounting();
+	// TestCounting();
+
+	TestPixels();
   }
   /* USER CODE END 3 */
 }
