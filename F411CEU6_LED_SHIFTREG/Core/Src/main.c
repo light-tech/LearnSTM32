@@ -59,6 +59,61 @@ static void MX_SPI1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// Shift out 8 bits to the shift register (LSB will be output A, MSB will be output H as in the datasheet)
+// state = [H G F E ... A] in binary
+void ShiftOut(uint8_t state) {
+	status = HAL_SPI_Transmit(&hspi1, &state, 1, 10);
+
+	HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_SET);
+}
+
+// Various method to test with a single digit 7-segment display
+
+void TestSingleByteShift() {
+  state = 0x0f;
+  ShiftOut(state);
+}
+
+void TestIndividualBit() {
+	state = 0x01;
+	for(int i = 0; i < 8; i++) {
+		ShiftOut(state);
+		state = state << 1;
+		HAL_Delay(500);
+	}
+}
+
+// LED edges in the 7-segment display to turn on for the digits
+const uint8_t digits[] = {
+		0b00111111,  // 0 = {A, B, C, D, E, F}
+		0b00000110,  // 1 = {B, C}
+		0b01011011,  // 2 = {A, B, D, E, G }
+		0b01001111,  // 3 = {A, B, C, D, G }
+		0b01100110,  // 4 = {B, C, F, G }
+		0b01101101,  // 5 = {A, C, D, F, G }
+		0b01111101,  // 6 = {A, C, D, E, F, G }
+		0b00000111,  // 7 = {A, B, C }
+		0b01111111,  // 8 = {A, B, C, D, E, F, G }
+		0b01101111,  // 9 = {A, B, D, E, G }
+		// Unfortunately, we cannot do hexadecimal since B is indistinguishable from 8 and D from 0.
+};
+
+void TestDigits() {
+	for(int d = 0; d < 10; d++) {
+		state = digits[d];
+		ShiftOut(state);
+		HAL_Delay(500);
+	}
+}
+
+void TestAllByteShift() {
+	for(state = 0x00; state <= 0xff; state++) {
+	  ShiftOut(state);
+	  HAL_Delay(100);
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -91,7 +146,7 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-
+  // TestSingleByteShift();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -101,15 +156,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	for(state = 0x00; state <= 0xff; state++) {
-	  // state = 0xff;
-	  status = HAL_SPI_Transmit(&hspi1, &state, 1, 10);
+	TestDigits();
+	TestAllByteShift();
 
-	  HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LATCH_GPIO_Port, LATCH_Pin, GPIO_PIN_SET);
-
-	  HAL_Delay(100);
-	}
   }
   /* USER CODE END 3 */
 }
