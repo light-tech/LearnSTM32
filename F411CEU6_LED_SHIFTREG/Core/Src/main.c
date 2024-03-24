@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -239,7 +239,7 @@ void RenderBitmap(uint8_t bitmap[8]) {
 	}
 }
 
-uint8_t infiniteBitmap[8] = {
+const uint8_t infiniteBitmap[8] = {
 	0b00000000,
 	0b00000000,
 	0b01100110,
@@ -253,6 +253,36 @@ uint8_t infiniteBitmap[8] = {
 void TestBitmap() {
 	for(int i = 0; i < 100; i++) {
 		RenderBitmap(infiniteBitmap);
+	}
+}
+
+const uint8_t leftArrowBitmap[8] = {
+	0b00000000,
+	0b00001000,
+	0b00001100,
+	0b01111110,
+	0b01111111,
+	0b01111110,
+	0b00001100,
+	0b00001000
+};
+
+uint8_t leftArrowBitmapTranslated[8];
+
+void TestAnimation() {
+	// Reset the current image
+	memcpy(leftArrowBitmapTranslated, leftArrowBitmap, sizeof(leftArrowBitmap));
+
+	for(int i = 0; i < 8; i++) {
+		// Render the translated image for a bit of time before moving to the next frame
+		for(int i = 0; i < 20; i++) {
+			RenderBitmap(leftArrowBitmapTranslated);
+		}
+
+		// Shift all rows to the right to produce animation
+		for(int r = 0; r < 8; r++) {
+			leftArrowBitmapTranslated[r] = leftArrowBitmapTranslated[r] >> 1;
+		}
 	}
 }
 /* USER CODE END 0 */
@@ -303,8 +333,9 @@ int main(void)
 	// TestAllDigits();
 	// TestCounting();
 
-	TestPixels();
-	TestBitmap();
+	// TestPixels();
+	// TestBitmap();
+	TestAnimation();
   }
   /* USER CODE END 3 */
 }
