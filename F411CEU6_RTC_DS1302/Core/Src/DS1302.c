@@ -1,4 +1,5 @@
 #include "DS1302.h"
+#include "main.h"
 
 // Write Register Address
 #define DS1302_SEC				0x80
@@ -21,10 +22,10 @@
 #define BCD2HEX(v)	((v) % 16 + (v) / 16 * 10)
 
 // GPIO Pins
-#define DS1302_GPIO	GPIOB
-#define DS1302_SCLK	GPIO_PIN_6
-#define DS1302_SDA	GPIO_PIN_7
-#define DS1302_RST	GPIO_PIN_5
+//#define DS1302_GPIO	GPIOB
+//#define DS1302_SCLK	GPIO_PIN_6
+//#define DS1302_SDA	GPIO_PIN_7
+//#define DS1302_RST	GPIO_PIN_5
 
 /* Clock signal need to be at least 1 micro second wide, those delays are generated with DWT		*/
 /* More info:  https://www.carminenoviello.com/2015/09/04/precisely-measure-microseconds-stm32/ */
@@ -46,10 +47,10 @@ static void delayUS_DWT(uint32_t us) {
 static void writeSDA(void) {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	GPIO_InitStructure.Pin = DS1302_SDA;
-  GPIO_InitStructure.Mode =  GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Pin = DS1302_DAT_Pin;
+	GPIO_InitStructure.Mode =  GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(DS1302_GPIO, &GPIO_InitStructure);
+	HAL_GPIO_Init(DS1302_DAT_GPIO_Port, &GPIO_InitStructure);
 	
 }
 
@@ -57,11 +58,11 @@ static void writeSDA(void) {
 static void readSDA(void) {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	GPIO_InitStructure.Pin = DS1302_SDA;
-  GPIO_InitStructure.Mode =  GPIO_MODE_INPUT;
+	GPIO_InitStructure.Pin = DS1302_DAT_Pin;
+	GPIO_InitStructure.Mode =  GPIO_MODE_INPUT;
 	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
 	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(DS1302_GPIO, &GPIO_InitStructure);	
+	HAL_GPIO_Init(DS1302_DAT_GPIO_Port, &GPIO_InitStructure);
 }
 
 /* Sends an address or command */
@@ -70,12 +71,12 @@ static void DS1302_SendCmd(uint8_t cmd) {
 	for (i = 0; i < 8; i ++) 
 	{	
 //		DS1302_SDA = (bit)(addr & 1); 
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA, (cmd & 1) ?  GPIO_PIN_SET :  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin, (cmd & 1) ?  GPIO_PIN_SET :  GPIO_PIN_RESET);
 //		DS1302_SCK = 1;
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_SET);
+		HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_SET);
 		delayUS_DWT(1);
 //		DS1302_SCK = 0;
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_RESET);
 		delayUS_DWT(1);
 		cmd >>= 1;
 	}
@@ -88,7 +89,7 @@ static void DS1302_WriteByte(uint8_t addr, uint8_t d)
 	uint8_t i;
 
 //	DS1302_RST = 1;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_SET);	
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_SET);
 	
 	//addr = addr & 0xFE;
 	DS1302_SendCmd(addr);	// Sends address
@@ -96,20 +97,20 @@ static void DS1302_WriteByte(uint8_t addr, uint8_t d)
 	for (i = 0; i < 8; i ++) 
 	{
 //		DS1302_SDA = (bit)(d & 1);
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA, (d & 1) ?  GPIO_PIN_SET :  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin, (d & 1) ?  GPIO_PIN_SET :  GPIO_PIN_RESET);
 //		DS1302_SCK = 1;
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_SET);
+		HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_SET);
 		delayUS_DWT(1);
 //		DS1302_SCK = 0;
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_RESET);
 		delayUS_DWT(1);
 		d >>= 1;
 	}
 	
 //	DS1302_RST = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_RESET);
 	//	DS1302_SDA = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin,  GPIO_PIN_RESET);
 }
 
 
@@ -121,7 +122,7 @@ static void DS1302_WriteBurst(uint8_t cmd, uint8_t len, uint8_t * temp)
 	DS1302_WriteByte(DS1302_CONTROL,0x00);			// Disable write protection
 
 //	DS1302_RST = 1;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_SET);	
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_SET);
 	
 	DS1302_SendCmd(cmd);	// Sends burst write command
 	
@@ -129,21 +130,21 @@ static void DS1302_WriteBurst(uint8_t cmd, uint8_t len, uint8_t * temp)
 		for (i = 0; i < 8; i ++) 
 		{
 //			DS1302_SDA = (bit)(d & 1);
-			HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA, (temp[j] & 1) ?  GPIO_PIN_SET :  GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin, (temp[j] & 1) ?  GPIO_PIN_SET :  GPIO_PIN_RESET);
 //			DS1302_SCK = 1;
-			HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_SET);
+			HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_SET);
 			delayUS_DWT(1);
 //			DS1302_SCK = 0;
-			HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_RESET);
 			delayUS_DWT(1);
 			temp[j] >>= 1;
 		}
 	}
 	
 //	DS1302_RST = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_RESET);
 	//	DS1302_SDA = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin,  GPIO_PIN_RESET);
 	
 	DS1302_WriteByte(DS1302_CONTROL,0x80);			// Enable write protection
 }
@@ -156,7 +157,7 @@ static uint8_t DS1302_ReadByte(uint8_t addr)
 	uint8_t temp = 0;
 
 //	DS1302_RST = 1;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_SET);	
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_SET);
 	addr = addr | 0x01; // Generate Read Address
 
 	DS1302_SendCmd(addr);	// Sends address
@@ -166,21 +167,21 @@ static uint8_t DS1302_ReadByte(uint8_t addr)
 	{
 		temp >>= 1;
 //		if(DS1302_SDA)
-		if(HAL_GPIO_ReadPin(DS1302_GPIO, DS1302_SDA))
+		if(HAL_GPIO_ReadPin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin))
 			temp |= 0x80;
 //		DS1302_SCK = 1;
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_SET);
+		HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_SET);
 		delayUS_DWT(1);
 //		DS1302_SCK = 0;
-		HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_RESET);
 		delayUS_DWT(1);
 	}
 	writeSDA();
 
 //	DS1302_RST = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_RESET);
 //	DS1302_SDA = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin,  GPIO_PIN_RESET);
 	return temp;
 }
 
@@ -191,7 +192,7 @@ static void DS1302_ReadBurst(uint8_t cmd, uint8_t len, uint8_t * temp)
 	uint8_t i, j;
 
 //	DS1302_RST = 1;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_SET);	
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_SET);
 	cmd = cmd | 0x01; // Generate read command
 
 	DS1302_SendCmd(cmd);	// Sends burst read command
@@ -203,15 +204,15 @@ static void DS1302_ReadBurst(uint8_t cmd, uint8_t len, uint8_t * temp)
 		{
 			temp[j] >>= 1;
 			//			if(DS1302_SDA)
-			if(HAL_GPIO_ReadPin(DS1302_GPIO, DS1302_SDA))
+			if(HAL_GPIO_ReadPin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin))
 				temp[j] |= 0x80;
 
 //			DS1302_SCK = 1;
-			HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_SET);
+			HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_SET);
 			delayUS_DWT(1);
 		
 //			DS1302_SCK = 0;
-			HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_RESET);
 			delayUS_DWT(1);
 
 		}
@@ -219,8 +220,8 @@ static void DS1302_ReadBurst(uint8_t cmd, uint8_t len, uint8_t * temp)
 	writeSDA();
 
 //	DS1302_RST = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SDA,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_DAT_GPIO_Port, DS1302_DAT_Pin,  GPIO_PIN_RESET);
 }
 
 
@@ -266,19 +267,25 @@ void DS1302_ReadTime(uint8_t *buf)
 /* Initialization */
 void DS1302_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
 
-	GPIO_InitStructure.Pin = DS1302_SCLK | DS1302_SDA | DS1302_RST;
-  GPIO_InitStructure.Mode =  GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Pin = DS1302_CLK_Pin; // DS1302_SCLK | DS1302_SDA | DS1302_RST;
+	GPIO_InitStructure.Mode =  GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(DS1302_GPIO, &GPIO_InitStructure);
+	HAL_GPIO_Init(DS1302_RST_GPIO_Port, &GPIO_InitStructure);
 	
+	GPIO_InitStructure.Pin = DS1302_DAT_Pin;
+	HAL_GPIO_Init(DS1302_DAT_GPIO_Port, &GPIO_InitStructure);
+
+	GPIO_InitStructure.Pin = DS1302_RST_Pin;
+	HAL_GPIO_Init(DS1302_RST_GPIO_Port, &GPIO_InitStructure);
+
 	DS1302_WriteByte(DS1302_CHARGER,0x00);			// Disable Trickle Charger 
 		
 //	DS1302_RST = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_RST,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_RST_GPIO_Port, DS1302_RST_Pin,  GPIO_PIN_RESET);
 //	DS1302_SCK = 0;
-	HAL_GPIO_WritePin(DS1302_GPIO, DS1302_SCLK,  GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(DS1302_CLK_GPIO_Port, DS1302_CLK_Pin,  GPIO_PIN_RESET);
 
 	DWT->CTRL |= 1 ; // enable the counter for microsecond delay, see "void delayUS_DWT(uint32_t us)"
 }
