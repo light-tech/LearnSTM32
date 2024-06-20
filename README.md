@@ -187,6 +187,8 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_RTC_DS1302`: RTC module again.
 
+    This time, I am trying another PWM pin (pin A8) for the `CLK` and `C14` and `C15` for `DATA` and `RST`, respectively. This requires modifications to the library which assumes the same port (i.e. all A or all B or all C) is used for all 3 pins.
+
   * `F411CEU6_Infrared`: Infrared receiver and remote.
 
   * `F411CEU6_FreeRTOS`: FreeRTOS.

@@ -57,6 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define DS1302_RST_Pin GPIO_PIN_14
+#define DS1302_RST_GPIO_Port GPIOC
+#define DS1302_DAT_Pin GPIO_PIN_15
+#define DS1302_DAT_GPIO_Port GPIOC
+#define DS1302_CLK_Pin GPIO_PIN_8
+#define DS1302_CLK_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
