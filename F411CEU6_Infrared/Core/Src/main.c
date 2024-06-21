@@ -47,13 +47,24 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+unsigned int data = 0;
 
+static void delayUS_DWT(uint32_t us) {
+	volatile uint32_t cycles = (SystemCoreClock/1000000L)*us;
+	volatile uint32_t start = DWT->CYCCNT;
+	volatile uint32_t end = start;
+	do  {
+		// Infinite loop here
+		end = DWT->CYCCNT;
+	} while(end - start < cycles);
+}
 /* USER CODE END 0 */
 
 /**
@@ -62,6 +73,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -83,8 +95,9 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  DWT->CTRL |= 1 ; // enable the counter for microsecond delay, see "void delayUS_DWT(uint32_t us)"
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -94,6 +107,31 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  while (HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1));   // wait for the pin to go low
+	  while (!(HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1)));  // wait for the pin to go high.. 9ms LOW
+	  while (HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1));   // wait for the pin to go low
+
+	  int count;
+	  for (int i=0; i<32; i++)
+	  {
+	    count=0;
+	    while (!(HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1))); // wait for pin to go high.. this is 562.5us LOW
+
+	    while ((HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1)))  // count the space length while the pin is high
+	   {
+	    count++;
+	    delayUS_DWT(100);
+	   }
+
+	   if (count > 12) // if the space is more than 1.2 ms
+	   {
+	    data |= (1UL << (31-i));   // write 1
+	   }
+
+	   else data &= ~(1UL << (31-i));  // write 0
+	  }
+
+	  HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
@@ -137,6 +175,31 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin : PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */

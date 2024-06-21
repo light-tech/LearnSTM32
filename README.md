@@ -191,4 +191,6 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
   * `F411CEU6_Infrared`: Infrared receiver and remote.
 
+    Adapt from [ControllerTech's tutorial](https://controllerstech.com/ir-remote-with-stm32/).
+
   * `F411CEU6_FreeRTOS`: FreeRTOS.
