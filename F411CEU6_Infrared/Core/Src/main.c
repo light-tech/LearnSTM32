@@ -107,17 +107,17 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  while (HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1));   // wait for the pin to go low
-	  while (!(HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1)));  // wait for the pin to go high.. 9ms LOW
-	  while (HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1));   // wait for the pin to go low
+	  while (HAL_GPIO_ReadPin (IR_1838_GPIO_Port, IR_1838_Pin));   // wait for the pin to go low
+	  while (!(HAL_GPIO_ReadPin (IR_1838_GPIO_Port, IR_1838_Pin)));  // wait for the pin to go high.. 9ms LOW
+	  while (HAL_GPIO_ReadPin (IR_1838_GPIO_Port, IR_1838_Pin));   // wait for the pin to go low
 
 	  int count;
 	  for (int i=0; i<32; i++)
 	  {
 	    count=0;
-	    while (!(HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1))); // wait for pin to go high.. this is 562.5us LOW
+	    while (!(HAL_GPIO_ReadPin (IR_1838_GPIO_Port, IR_1838_Pin))); // wait for pin to go high.. this is 562.5us LOW
 
-	    while ((HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_1)))  // count the space length while the pin is high
+	    while ((HAL_GPIO_ReadPin (IR_1838_GPIO_Port, IR_1838_Pin)))  // count the space length while the pin is high
 	   {
 	    count++;
 	    delayUS_DWT(100);
@@ -189,14 +189,15 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  /*Configure GPIO pin : PA1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  /*Configure GPIO pin : IR_1838_Pin */
+  GPIO_InitStruct.Pin = IR_1838_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(IR_1838_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

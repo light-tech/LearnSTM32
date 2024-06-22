@@ -189,8 +189,10 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     This time, I am trying another PWM pin (pin A8) for the `CLK` and `C14` and `C15` for `DATA` and `RST`, respectively. This requires modifications to the library which assumes the same port (i.e. all A or all B or all C) is used for all 3 pins.
 
-  * `F411CEU6_Infrared`: Infrared receiver and remote.
+  * `F411CEU6_Infrared`: Infrared 1838 receiver and remote.
 
     Adapt from [ControllerTech's tutorial](https://controllerstech.com/ir-remote-with-stm32/).
+
+    The project was configured to connect the IR 1838 signal output pin to PC13 (the onboard LED) so that the onboard LED will light up as the signal is received.
 
   * `F411CEU6_FreeRTOS`: FreeRTOS.
