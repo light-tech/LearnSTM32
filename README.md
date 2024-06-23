@@ -195,4 +195,8 @@ I am using STM32F411CEU6 with 512KB of Flash.
 
     The project was configured to connect the IR 1838 signal output pin to PC13 (the onboard LED) so that the onboard LED will light up as the signal is received.
 
+  * `F411CEU6_KY_038`: Sound sensor KY-038.
+
+    [Module description](https://circuitdigest.com/microcontroller-projects/interface-ky038-sound-sensor-with-esp32).
+
   * `F411CEU6_FreeRTOS`: FreeRTOS.
